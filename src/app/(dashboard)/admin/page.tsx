@@ -11,7 +11,7 @@ export default async function AdminDashboard() {
     prisma.siswa.count(),
     prisma.soal.count(),
     prisma.ujian.count(),
-    prisma.sesiUjian.count({ where: { status: StatusUjian.MENGERJAKAN } }),
+    prisma.sesiUjian.count({ where: { status: StatusUjian.BERJALAN } }),
     prisma.jadwalUjian.findMany({
       where: {
         waktuMulai: { lte: now },
