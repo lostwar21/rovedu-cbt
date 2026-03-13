@@ -1,0 +1,79 @@
+Message: Command failed: npx tsx prisma/seed.ts
+D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:260
+        throw new PrismaClientInitializationError(
+              ^
+
+PrismaClientInitializationError: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at new t (D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:260:15)
+    at bcrypt (D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\prisma\seed.ts:5:16)
+    at Object.<anonymous> (D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\prisma\seed.ts:38:6)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object.transformer (D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:336:3) {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined
+}
+
+Node.js v24.11.1
+
+
+STDOUT:
+
+
+STDERR:
+D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:260
+        throw new PrismaClientInitializationError(
+              ^
+
+PrismaClientInitializationError: `PrismaClient` needs to be constructed with a non-empty, valid `PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at new t (D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:260:15)
+    at bcrypt (D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\prisma\seed.ts:5:16)
+    at Object.<anonymous> (D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\prisma\seed.ts:38:6)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object.transformer (D:\Aset Server Roverhemen\Rovedu\Rovedu CBT\rovedu-cbt\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:336:3) {
+  clientVersion: '7.4.2',
+  errorCode: undefined,
+  retryable: undefined
+}
+
+Node.js v24.11.1

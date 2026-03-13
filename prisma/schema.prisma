@@ -1,0 +1,280 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- Autentikasi (NextAuth) ---
+
+enum Role {
+  ADMIN
+  GURU
+  PENGAWAS
+  SISWA
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  username  String?  @unique
+  password  String?
+  role      Role     @default(SISWA)
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relasi
+  guru  Guru?
+  siswa Siswa?
+}
+
+// --- Data Master ---
+
+model TahunAjaran {
+  id        String   @id @default(cuid())
+  nama      String // Contoh: 2023/2024
+  semester  String // Ganjil / Genap
+  aktif     Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  kelas Kelas[]
+  ujian Ujian[]
+}
+
+model Kelas {
+  id            String      @id @default(cuid())
+  nama          String // Contoh: X-IPA-1
+  tingkat       Int // 10, 11, 12
+  tahunAjaranId String
+  tahunAjaran   TahunAjaran @relation(fields: [tahunAjaranId], references: [id])
+
+  siswa  Siswa[]
+  ujian  Ujian[] // Ujian yang ditujukan untuk kelas ini
+  jadwal JadwalUjian[] // Baru: Jadwal yang melibatkan kelas ini
+}
+
+model MataPelajaran {
+  id   String @id @default(cuid())
+  nama String
+  kode String @unique
+
+  guru     Guru[] // Guru yang mengampu mapel ini
+  bankSoal BankSoal[]
+  ujian    Ujian[]
+}
+
+model RuangUjian {
+  id        String @id @default(cuid())
+  nama      String
+  kapasitas Int
+
+  jadwalUjian JadwalUjian[]
+}
+
+// --- Aktor Spesifik ---
+
+model Guru {
+  id     String  @id @default(cuid())
+  nip    String? @unique
+  userId String  @unique
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  mataPelajaran MataPelajaran[]
+  bankSoal      BankSoal[]
+}
+
+model Siswa {
+  id     String  @id @default(cuid())
+  nis    String  @unique
+  nisn   String? @unique
+  userId String  @unique
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  kelasId String
+  kelas   Kelas  @relation(fields: [kelasId], references: [id])
+
+  attempts SesiUjian[]
+  hasil    HasilUjian[]
+}
+
+// --- Bank Soal ---
+
+enum TipeSoal {
+  PG
+  ESSAY
+}
+
+model BankSoal {
+  id              String        @id @default(cuid())
+  nama            String
+  mataPelajaranId String
+  mataPelajaran   MataPelajaran @relation(fields: [mataPelajaranId], references: [id])
+  guruId          String
+  guru            Guru          @relation(fields: [guruId], references: [id])
+
+  soal  Soal[]
+  ujian Ujian[]
+}
+
+enum TingkatKesulitan {
+  MUDAH
+  SEDANG
+  SULIT
+}
+
+model Soal {
+  id     String   @id @default(cuid())
+  teks   String   @db.Text
+  gambar String? // URL gambar
+  tipe   TipeSoal @default(PG)
+  bobot  Int      @default(1)
+
+  // --- Metadata Lanjutan (Target M4.1) ---
+  kategori         String? // Untuk manajemen paket/topik
+  kompetensiDasar  String? // Pemetaan KD
+  tingkatKesulitan TingkatKesulitan? @default(SEDANG)
+  taksonomi        String? // C1, C2, C3, C4, C5, C6
+  acakOpsi         Boolean           @default(true) // Sakelar pengacakan opsi khusus soal ini
+  rubrikPenilaian  String?           @db.Text // Kunci/Rubrik khusus essay
+  izinkanLampiran  Boolean           @default(false) // Opsi upload file untuk essay
+
+  bankSoalId String
+  bankSoal   BankSoal @relation(fields: [bankSoalId], references: [id], onDelete: Cascade)
+
+  opsi    OpsiJawaban[]
+  jawaban JawabanSiswa[]
+}
+
+model OpsiJawaban {
+  id    String  @id @default(cuid())
+  teks  String  @db.Text
+  benar Boolean @default(false)
+
+  soalId String
+  soal   Soal   @relation(fields: [soalId], references: [id], onDelete: Cascade)
+}
+
+// --- Manajemen Ujian ---
+
+enum SkalaUjian {
+  HARIAN
+  UTS
+  UAS
+  TRYOUT
+  LAINNYA
+}
+
+model Ujian {
+  id             String     @id @default(cuid())
+  judul          String
+  deskripsi      String?    @db.Text
+  skala          SkalaUjian @default(HARIAN) // Baru: menentukan siapa yang berwenang atas token/jadwal
+  durasi         Int // Dalam menit
+  token          String? // Kode unik untuk mulai
+  acakSoal       Boolean    @default(true)
+  acakOpsi       Boolean    @default(true)
+  tampilkanHasil Boolean    @default(false)
+
+  tahunAjaranId   String
+  tahunAjaran     TahunAjaran   @relation(fields: [tahunAjaranId], references: [id])
+  mataPelajaranId String
+  mataPelajaran   MataPelajaran @relation(fields: [mataPelajaranId], references: [id])
+  bankSoalId      String
+  bankSoal        BankSoal      @relation(fields: [bankSoalId], references: [id])
+
+  kelas    Kelas[]
+  jadwal   JadwalUjian[]
+  attempts SesiUjian[]
+}
+
+model JadwalUjian {
+  id         String     @id @default(cuid())
+  ujianId    String
+  ujian      Ujian      @relation(fields: [ujianId], references: [id], onDelete: Cascade)
+  ruangId    String
+  ruang      RuangUjian @relation(fields: [ruangId], references: [id])
+  pengawasId String? // User ID pengawas
+
+  kelas Kelas[] // Baru: Jadwal ini khusus untuk kelas-kelas tertentu
+
+  waktuMulai   DateTime
+  waktuSelesai DateTime
+  sesi         SesiUjian[]
+}
+
+// --- Pelaksanaan Ujian (Real-time & Logs) ---
+
+enum StatusUjian {
+  BERJALAN
+  SELESAI
+  DIBLOKIR
+}
+
+model SesiUjian {
+  id       String       @id @default(cuid())
+  siswaId  String
+  siswa    Siswa        @relation(fields: [siswaId], references: [id])
+  ujianId  String
+  ujian    Ujian        @relation(fields: [ujianId], references: [id])
+  jadwalId String?
+  jadwal   JadwalUjian? @relation(fields: [jadwalId], references: [id])
+
+  waktuMulai   DateTime    @default(now())
+  waktuSelesai DateTime?
+  status       StatusUjian @default(BERJALAN)
+  ipAddress    String?
+  userAgent    String?
+
+  logPelanggaran Pelanggaran[]
+  jawaban        JawabanSiswa[]
+  hasil          HasilUjian?
+
+  @@unique([siswaId, ujianId]) // Mencegah duplikasi sesi (Race Condition Fix)
+  @@index([jadwalId])          // Monitoring pengawas
+  @@index([status])            // Filter by status
+}
+
+model Pelanggaran {
+  id         String    @id @default(cuid())
+  sesiId     String
+  sesi       SesiUjian @relation(fields: [sesiId], references: [id], onDelete: Cascade)
+  tipe       String // misal: "TAB_SWITCH"
+  waktu      DateTime  @default(now())
+  keterangan String?
+
+  @@index([sesiId]) // Log per sesi
+}
+
+model JawabanSiswa {
+  id     String    @id @default(cuid())
+  sesiId String
+  sesi   SesiUjian @relation(fields: [sesiId], references: [id], onDelete: Cascade)
+  soalId String
+  soal   Soal      @relation(fields: [soalId], references: [id])
+
+  opsiDipilihId String? // Untuk PG
+  jawabanEssay  String?  @db.Text // Untuk Essay
+  nilaiEssay    Int? // Diisi guru secara manual
+  ragu          Boolean  @default(false)
+  updatedAt     DateTime @updatedAt
+
+  @@unique([sesiId, soalId]) // Satu jawaban per soal per sesi (Upsert key)
+  @@index([sesiId])          // Ambil semua jawaban sesi
+}
+
+model HasilUjian {
+  id      String    @id @default(cuid())
+  siswaId String
+  siswa   Siswa     @relation(fields: [siswaId], references: [id])
+  sesiId  String    @unique
+  sesi    SesiUjian @relation(fields: [sesiId], references: [id])
+
+  nilaiPg    Float   @default(0)
+  nilaiEssay Float   @default(0)
+  nilaiTotal Float   @default(0)
+  lulus      Boolean @default(true)
+
+  @@index([siswaId]) // Riwayat siswa
+}
