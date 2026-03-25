@@ -4,6 +4,7 @@ import * as React from "react";
 import { useState, useTransition } from "react";
 import { Plus, Edit2, Trash2, X, Loader2, BookOpen } from "lucide-react";
 import { createMataPelajaran, updateMataPelajaran, deleteMataPelajaran } from "@/lib/actions/mapel";
+import { Modal } from "@/components/ui/Modal";
 
 interface Mapel {
   id: string;
@@ -124,62 +125,52 @@ export function MapelTable({ data }: Props) {
         </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-[var(--radius-lg)] shadow-2xl border border-border overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-border flex items-center justify-between">
-              <h2 className="text-xl font-bold text-foreground">
-                {editingItem ? "Edit Mata Pelajaran" : "Tambah Mata Pelajaran"}
-              </h2>
-              <button 
-                onClick={handleCloseModal}
-                className="p-2 text-muted-foreground hover:bg-muted rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Kode Mapel (Singkatan)</label>
-                <input
-                  name="kode"
-                  defaultValue={editingItem?.kode}
-                  required
-                  placeholder="Contoh: MAT, BIND, FIS"
-                  className="w-full px-4 py-2 rounded-md border border-border bg-background uppercase focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Nama Mata Pelajaran</label>
-                <input
-                  name="nama"
-                  defaultValue={editingItem?.nama}
-                  required
-                  placeholder="Contoh: Matematika Wajib"
-                  className="w-full px-4 py-2 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                />
-              </div>
-              <div className="pt-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="flex-1 px-4 py-2 border border-border text-foreground rounded-md hover:bg-muted font-medium transition-all"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 font-medium transition-all flex items-center justify-center gap-2"
-                >
-                  {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Simpan
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title={editingItem ? "Edit Mata Pelajaran" : "Tambah Mata Pelajaran"}
+        maxWidth="md"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Kode Mapel (Singkatan)</label>
+            <input
+              name="kode"
+              defaultValue={editingItem?.kode}
+              required
+              placeholder="Contoh: MAT, BIND, FIS"
+              className="w-full px-4 py-2 rounded-md border border-border bg-background uppercase focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            />
           </div>
-        </div>
-      )}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Nama Mata Pelajaran</label>
+            <input
+              name="nama"
+              defaultValue={editingItem?.nama}
+              required
+              placeholder="Contoh: Matematika Wajib"
+              className="w-full px-4 py-2 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            />
+          </div>
+          <div className="pt-4 flex gap-3">
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="flex-1 px-4 py-2 border border-border text-foreground rounded-md hover:bg-muted font-medium transition-all"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              disabled={isPending}
+              className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 font-medium transition-all flex items-center justify-center gap-2"
+            >
+              {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+              Simpan
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

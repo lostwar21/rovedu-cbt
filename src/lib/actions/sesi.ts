@@ -146,12 +146,17 @@ export async function getDetailSesiUjian(sesiId: string) {
   return {
     sesi: {
       id: sesi.id,
-      waktuMulai: sesi.waktuMulai,
+      waktuMulai: sesi.waktuMulai.toISOString(),
+      status: sesi.status,
       ujian: {
         judul: sesi.ujian.judul,
         durasi: sesi.ujian.durasi,
         mapel: sesi.ujian.mataPelajaran?.nama,
-      }
+      },
+      // Hitung sisa waktu dalam detik di server
+      sisaDetik: Math.max(0, Math.floor(
+        ((sesi.waktuMulai.getTime() + (sesi.ujian.durasi * 60 * 1000)) - Date.now()) / 1000
+      ))
     },
     soal: listSoal,
     jawabanExist: jawabanRaw

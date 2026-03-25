@@ -16,11 +16,12 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String?
-  username  String?  @unique
-  password  String?
-  role      Role     @default(SISWA)
+  id          String   @id @default(cuid())
+  name        String?
+  username    String?  @unique
+  password    String?
+  passwordRaw String?  // Field untuk cetak kartu ujian
+  role        Role     @default(SISWA)
   image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -31,7 +31,7 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, { opsiId?: string; essay?: string; ragu: boolean }>>({});
   const [showSidebar, setShowSidebar] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(sesi.sisaDetik || 0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [sessionStatus, setSessionStatus] = useState(sesi.status);
@@ -227,24 +227,21 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
 
   // Timer logic
   useEffect(() => {
-    const startTime = new Date(sesi.waktuMulai).getTime();
-    const duration = sesi.ujian.durasi * 60 * 1000;
-    const endTime = startTime + duration;
+    if (sessionStatus !== "BERJALAN" || isSubmitting) return;
 
-    const updateTimer = () => {
-      const now = new Date().getTime();
-      const diff = Math.max(0, Math.floor((endTime - now) / 1000));
-      setTimeLeft(diff);
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          handleAutoSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-      if (diff <= 0 && !isSubmitting) {
-        handleAutoSubmit();
-      }
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [sesi, isSubmitting]);
+  }, [sessionStatus, isSubmitting, handleAutoSubmit]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -311,6 +308,22 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
         <Loader2 className="w-12 h-12 text-primary animate-spin" />
         <p className="text-xl font-bold">Sedang memproses jawaban Anda...</p>
         <p className="text-muted-foreground">Mohon jangan menutup halaman ini.</p>
+      </div>
+    );
+  }
+
+  if (!listSoal || listSoal.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-background z-[200] flex flex-col items-center justify-center space-y-4 p-4 text-center">
+        <AlertTriangle className="w-16 h-16 text-amber-500" />
+        <h1 className="text-2xl font-bold">Soal Belum Siap</h1>
+        <p className="text-muted-foreground max-w-md">Data soal tidak ditemukan atau belum diatur oleh guru. Silakan hubungi pengawas.</p>
+        <button 
+          onClick={() => router.push('/siswa/ujian')}
+          className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-bold"
+        >
+          Kembali ke Dashboard
+        </button>
       </div>
     );
   }

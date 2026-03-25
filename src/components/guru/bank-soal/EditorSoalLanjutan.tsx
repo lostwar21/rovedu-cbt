@@ -6,6 +6,7 @@ import { Plus, Trash2, ArrowLeft, Save, LayoutGrid, CheckCircle2, Circle, AlertC
 import { createSoalPG, createSoalEssay, updateSoalPG, updateSoalEssay, deleteSoal } from "@/lib/actions/soal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ImportSoalModal } from "@/components/guru/bank-soal/ImportSoalModal";
 
 interface BankSoalLengkap {
   id: string;
@@ -22,6 +23,7 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [mode, setMode] = useState<"LIST" | "ADD_PG" | "ADD_ESSAY">("LIST");
+  const [showImportModal, setShowImportModal] = useState(false);
   const [editingSoal, setEditingSoal] = useState<any | null>(null);
   
   // State Input Form Soal Universal
@@ -44,6 +46,14 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
   const [rubrikPenilaian, setRubrikPenilaian] = useState("");
   const [izinkanLampiran, setIzinkanLampiran] = useState(false);
 
+  const handleSisipGambar = () => {
+    const url = window.prompt("Masukkan URL Gambar:\nContoh: https://example.com/gambar.jpg");
+    if (url && url.trim() !== "") {
+      const imgTag = `\n<div class="my-4"><img src="${url.trim()}" class="max-w-md w-full rounded-lg border border-border mx-auto shadow-sm" alt="Ilustrasi Soal"/></div>\n`;
+      setTeks(prev => prev + imgTag);
+    }
+  };
+
   const resetForm = () => {
     setTeks("");
     setBobot("1");
@@ -59,8 +69,8 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
     ]);
     setRubrikPenilaian("");
     setIzinkanLampiran(false);
+    setEditingSoal(null);
   };
-
   // Membuka form edit dengan data soal yang sudah ada
   const handleEditSoal = (s: any) => {
     setEditingSoal(s);
@@ -178,7 +188,7 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
                              className="w-full px-4 py-3 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all custom-scrollbar"
                            />
                            <div className="flex gap-2">
-                               <button className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted/50 hover:bg-muted text-muted-foreground transition-colors border border-border/50">
+                               <button type="button" onClick={handleSisipGambar} className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted/50 hover:bg-muted text-muted-foreground transition-colors border border-border/50">
                                    <ImageIcon className="w-3.5 h-3.5"/> Sisipkan Gambar (BETA)
                                </button>
                            </div>
@@ -308,7 +318,7 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
                              className="w-full px-4 py-3 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all custom-scrollbar"
                            />
                            <div className="flex gap-2">
-                               <button className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted/50 hover:bg-muted text-muted-foreground transition-colors border border-border/50">
+                               <button type="button" onClick={handleSisipGambar} className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-muted/50 hover:bg-muted text-muted-foreground transition-colors border border-border/50">
                                    <ImageIcon className="w-3.5 h-3.5"/> Sisipkan Gambar (BETA)
                                </button>
                            </div>
@@ -415,6 +425,12 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
             
             <div className="flex gap-2">
                 <button 
+                  onClick={() => setShowImportModal(true)} 
+                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600/10 text-emerald-600 border border-emerald-600/20 hover:bg-emerald-600 hover:text-white rounded-md transition-all font-medium text-sm shadow-sm"
+                >
+                  <FileText className="w-4 h-4" /> Import Excel
+                </button>
+                <button 
                     onClick={() => { resetForm(); setMode("ADD_ESSAY"); }}
                     className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-all font-medium text-sm shadow-sm"
                 >
@@ -482,6 +498,11 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
                  ))
              )}
         </div>
+
+        {showImportModal && (
+          <ImportSoalModal bankSoalId={bankSoal.id} onClose={() => setShowImportModal(false)} />
+        )}
+
     </div>
   );
 }

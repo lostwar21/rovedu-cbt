@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, Clock, MapPin, Key, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { mulaiUjianAction } from "@/lib/actions/sesi";
+import { Modal } from "@/components/ui/Modal";
 
 interface Props {
   data: {
@@ -153,55 +154,52 @@ export function DaftarUjianSiswa({ data }: Props) {
       )}
 
       {/* Token Modal */}
-      {showTokenModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => !isPending && setShowTokenModal(false)} />
-          <div className="relative bg-card border border-border rounded-xl shadow-2xl w-full max-w-sm p-6 overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
-            
-            <div className="mb-6">
-              <h2 className="text-xl font-bold">Masukkan Token</h2>
-              <p className="text-sm text-muted-foreground mt-1">Ujian "{selectedJadwal?.ujian.judul}" memerlukan token untuk memulai.</p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="Contoh: ASD123"
-                  value={tokenInput}
-                  onChange={(e) => setTokenInput(e.target.value.toUpperCase())}
-                  className="w-full text-center text-2xl font-mono py-3 rounded-lg bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 transition-all uppercase placeholder:opacity-50"
-                  autoFocus
-                />
-                {error && (
-                  <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 p-2 rounded border border-destructive/20">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    <span>{error}</span>
-                  </div>
-                )}
+      <Modal
+        isOpen={showTokenModal}
+        onClose={() => !isPending && setShowTokenModal(false)}
+        title="Masukkan Token"
+        maxWidth="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">Ujian "{selectedJadwal?.ujian.judul}" memerlukan token untuk memulai.</p>
+          
+          <div className="space-y-2">
+            <input
+              type="text"
+              placeholder="Contoh: ASD123"
+              value={tokenInput}
+              onChange={(e) => setTokenInput(e.target.value.toUpperCase())}
+              className="w-full text-center text-2xl font-mono py-3 rounded-lg bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 transition-all uppercase placeholder:opacity-50"
+              autoFocus
+            />
+            {error && (
+              <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 p-2 rounded border border-destructive/20 animate-in fade-in slide-in-from-top-1">
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>{error}</span>
               </div>
+            )}
+          </div>
 
-              <div className="flex gap-2">
-                <button
-                  disabled={isPending}
-                  onClick={() => setShowTokenModal(false)}
-                  className="flex-1 py-2.5 rounded-lg border border-border hover:bg-muted font-medium text-sm transition-colors"
-                >
-                  Batal
-                </button>
-                <button
-                  disabled={isPending || !tokenInput}
-                  onClick={() => executeMulaiUjian(selectedJadwal.id, tokenInput)}
-                  className="flex-1 py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
-                >
-                  {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Validasi"}
-                </button>
-              </div>
-            </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setShowTokenModal(false)}
+              className="flex-1 py-2.5 rounded-lg border border-border hover:bg-muted font-medium text-sm transition-colors"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={isPending || !tokenInput}
+              onClick={() => executeMulaiUjian(selectedJadwal.id, tokenInput)}
+              className="flex-1 py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+            >
+              {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Validasi"}
+            </button>
           </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

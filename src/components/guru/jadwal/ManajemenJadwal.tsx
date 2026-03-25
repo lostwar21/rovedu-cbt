@@ -14,6 +14,7 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
+import { Modal } from "@/components/ui/Modal";
 import {
   createJadwalUjian,
   updateJadwalUjian,
@@ -259,145 +260,130 @@ export function ManajemenJadwal({
       </div>
 
       {/* Modal Form */}
-      {showModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-            onClick={() => !isPending && setShowModal(false)}
-          />
-          <div className="relative bg-card border border-border rounded-xl shadow-2xl w-full max-w-lg p-6 space-y-5">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">
-                {editingJadwal ? "Edit Jadwal" : "Tambah Jadwal Baru"}
-              </h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-muted rounded-full"
-              >
-                <X className="w-5 h-5" />
-              </button>
+      <Modal
+        isOpen={showModal}
+        onClose={() => !isPending && setShowModal(false)}
+        title={editingJadwal ? "Edit Jadwal" : "Tambah Jadwal Baru"}
+      >
+        <div className="space-y-4">
+          {/* Ujian */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Pilih Ujian</label>
+            <select
+              disabled={!!editingJadwal}
+              value={ujianId}
+              onChange={(e) => setUjianId(e.target.value)}
+              className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
+            >
+              <option value="">-- Pilih Ujian --</option>
+              {listUjian.map((ex) => (
+                <option key={ex.id} value={ex.id}>
+                  {ex.judul} ({ex.mataPelajaran.nama})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Ruang */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Ruang Ujian</label>
+            <select
+              value={ruangId}
+              onChange={(e) => setRuangId(e.target.value)}
+              className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
+            >
+              <option value="">-- Pilih Ruang --</option>
+              {listRuang.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.nama} (Kap: {r.kapasitas})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Tanggal */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Tanggal</label>
+            <input
+              type="date"
+              value={tanggal}
+              onChange={(e) => setTanggal(e.target.value)}
+              className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          {/* Waktu */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Jam Mulai</label>
+              <input
+                type="time"
+                value={jamMulai}
+                onChange={(e) => setJamMulai(e.target.value)}
+                className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
+              />
             </div>
-
-            <div className="space-y-4">
-              {/* Ujian */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Pilih Ujian</label>
-                <select
-                  disabled={!!editingJadwal}
-                  value={ujianId}
-                  onChange={(e) => setUjianId(e.target.value)}
-                  className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
-                >
-                  <option value="">-- Pilih Ujian --</option>
-                  {listUjian.map((ex) => (
-                    <option key={ex.id} value={ex.id}>
-                      {ex.judul} ({ex.mataPelajaran.nama})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Ruang */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Ruang Ujian</label>
-                <select
-                  value={ruangId}
-                  onChange={(e) => setRuangId(e.target.value)}
-                  className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                >
-                  <option value="">-- Pilih Ruang --</option>
-                  {listRuang.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.nama} (Kap: {r.kapasitas})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Tanggal */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Tanggal</label>
-                <input
-                  type="date"
-                  value={tanggal}
-                  onChange={(e) => setTanggal(e.target.value)}
-                  className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                />
-              </div>
-
-              {/* Waktu */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Jam Mulai</label>
-                  <input
-                    type="time"
-                    value={jamMulai}
-                    onChange={(e) => setJamMulai(e.target.value)}
-                    className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Jam Selesai</label>
-                  <input
-                    type="time"
-                    value={jamSelesai}
-                    onChange={(e) => setJamSelesai(e.target.value)}
-                    className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Pilih Kelas */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Pilih Kelas Peserta</label>
-                <div className="flex flex-wrap gap-2 p-3 bg-muted/50 border border-border rounded-md">
-                   {listKelas.map((k) => {
-                      const isSelected = selectedKelasIds.includes(k.id);
-                      return (
-                        <button
-                          key={k.id}
-                          type="button"
-                          onClick={() => {
-                             if (isSelected) {
-                                setSelectedKelasIds(selectedKelasIds.filter(id => id !== k.id));
-                             } else {
-                                setSelectedKelasIds([...selectedKelasIds, k.id]);
-                             }
-                          }}
-                          className={`px-3 py-1.5 rounded-md text-[11px] font-bold transition-all border ${
-                            isSelected 
-                              ? "bg-primary text-primary-foreground border-primary" 
-                              : "bg-background text-muted-foreground border-border hover:border-primary/50"
-                          }`}
-                        >
-                          {k.nama}
-                        </button>
-                      );
-                   })}
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 flex justify-end gap-3">
-              <button
-                disabled={isPending}
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors text-sm"
-              >
-                Batal
-              </button>
-              <button
-                disabled={isPending}
-                onClick={handleSave}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all text-sm font-medium flex items-center gap-2"
-              >
-                {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingJadwal ? "Update Jadwal" : "Simpan Jadwal"}
-              </button>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Jam Selesai</label>
+              <input
+                type="time"
+                value={jamSelesai}
+                onChange={(e) => setJamSelesai(e.target.value)}
+                className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
+              />
             </div>
           </div>
+
+          {/* Pilih Kelas */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Pilih Kelas Peserta</label>
+            <div className="flex flex-wrap gap-2 p-3 bg-muted/50 border border-border rounded-md">
+              {listKelas.map((k) => {
+                const isSelected = selectedKelasIds.includes(k.id);
+                return (
+                  <button
+                    key={k.id}
+                    type="button"
+                    onClick={() => {
+                      if (isSelected) {
+                        setSelectedKelasIds(selectedKelasIds.filter(id => id !== k.id));
+                      } else {
+                        setSelectedKelasIds([...selectedKelasIds, k.id]);
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-md text-[11px] font-bold transition-all border ${isSelected
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-muted-foreground border-border hover:border-primary/50"
+                      }`}
+                  >
+                    {k.nama}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="pt-4 flex justify-end gap-3">
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setShowModal(false)}
+              className="px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors text-sm"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={handleSave}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all text-sm font-medium flex items-center gap-2"
+            >
+              {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+              {editingJadwal ? "Update Jadwal" : "Simpan Jadwal"}
+            </button>
+          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

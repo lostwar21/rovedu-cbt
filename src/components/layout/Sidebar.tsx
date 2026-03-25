@@ -14,7 +14,8 @@ import {
     X,
     ClipboardList,
     FileText,
-    Activity
+    Activity,
+    Printer
 } from "lucide-react";
 
 // Role-based Navigation Menus
@@ -23,6 +24,7 @@ const MENUS = {
         { name: "Dashboard", href: "/admin", icon: Home },
         { name: "Data Master", href: "/admin/data-master", icon: Users },
         { name: "Penjadwalan Master", href: "/admin/penjadwalan", icon: Activity },
+        { name: "Cetak Kartu Login", href: "/admin/cetak-kartu", icon: Printer },
     ],
     GURU: [
         { name: "Dashboard", href: "/guru", icon: Home },

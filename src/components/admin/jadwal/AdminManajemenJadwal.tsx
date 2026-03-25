@@ -18,6 +18,7 @@ import {
   Search,
   CheckCircle2,
 } from "lucide-react";
+import { Modal } from "@/components/ui/Modal";
 import {
   createJadwalUjian,
   updateJadwalUjian,
@@ -363,178 +364,160 @@ export function AdminManajemenJadwal({
       </div>
 
       {/* Modal Form Admin */}
-      {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div
-            className="absolute inset-0 bg-background/90 backdrop-blur-md"
-            onClick={() => !isPending && setShowModal(false)}
-          />
-          <div className="relative bg-card border border-border rounded-3xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-8 pb-4">
-              <div className="flex justify-between items-start">
-                <div>
-                   <h2 className="text-2xl font-black tracking-tight flex items-center gap-2">
-                    {editingJadwal ? "Sesuaikan Roster" : "Pemetaan Roster Baru"}
-                    <Shield className="w-5 h-5 text-primary" />
-                  </h2>
-                  <p className="text-muted-foreground text-sm">Otoritas Master Admin: Menyamakan roster dengan jadwal pengawas pusat.</p>
-                </div>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="p-2 hover:bg-muted rounded-full transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+      <Modal
+        isOpen={showModal}
+        onClose={() => !isPending && setShowModal(false)}
+        title={editingJadwal ? "Sesuaikan Roster" : "Pemetaan Roster Baru"}
+        maxWidth="xl"
+      >
+        <div className="space-y-6">
+          <p className="text-muted-foreground text-sm -mt-4">Otoritas Master Admin: Menyamakan roster dengan jadwal pengawas pusat.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Ujian */}
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-[11px] font-black uppercase text-muted-foreground flex items-center gap-1">
+                Pilih Mata Ujian (List Guru) 
+              </label>
+              <select
+                disabled={!!editingJadwal}
+                value={ujianId}
+                onChange={(e) => setUjianId(e.target.value)}
+                className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all font-medium disabled:opacity-50"
+              >
+                <option value="">-- Pilih Ujian & Pengampu --</option>
+                {listUjian.map((ex) => (
+                  <option key={ex.id} value={ex.id}>
+                    {ex.judul} - [{ex.bankSoal?.guru.user.name || 'Guru'}]
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Ruang */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black uppercase text-muted-foreground">Lokasi Ruangan</label>
+              <select
+                value={ruangId}
+                onChange={(e) => setRuangId(e.target.value)}
+                className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all font-medium"
+              >
+                <option value="">-- Pilih Ruang --</option>
+                {listRuang.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.nama} (Kap: {r.kapasitas})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Pengawas */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black uppercase text-muted-foreground">Petugas Pengawas</label>
+              <select
+                value={pengawasId}
+                onChange={(e) => setPengawasId(e.target.value)}
+                className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all font-bold"
+              >
+                <option value="">-- Tanpa Pengawas --</option>
+                {listPengawas.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Tanggal */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black uppercase text-muted-foreground">Hari & Tanggal</label>
+              <input
+                type="date"
+                value={tanggal}
+                onChange={(e) => setTanggal(e.target.value)}
+                className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
+              />
+            </div>
+
+            {/* Waktu */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase text-muted-foreground">Mulai</label>
+                <input
+                  type="time"
+                  value={jamMulai}
+                  onChange={(e) => setJamMulai(e.target.value)}
+                  className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-black uppercase text-muted-foreground">Selesai</label>
+                <input
+                  type="time"
+                  value={jamSelesai}
+                  onChange={(e) => setJamSelesai(e.target.value)}
+                  className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
+                />
               </div>
             </div>
 
-            <div className="p-8 pt-0 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Ujian */}
-                <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-[11px] font-black uppercase text-muted-foreground flex items-center gap-1">
-                        Pilih Mata Ujian (List Guru) 
-                    </label>
-                    <select
-                        disabled={!!editingJadwal}
-                        value={ujianId}
-                        onChange={(e) => setUjianId(e.target.value)}
-                        className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all font-medium disabled:opacity-50"
+            {/* Pilih Kelas */}
+            <div className="space-y-3 md:col-span-2">
+              <label className="text-[11px] font-black uppercase text-muted-foreground flex items-center justify-between">
+                Peserta Ujian (Kelas)
+                <span className="normal-case font-medium text-[10px] opacity-70">Pilih satu atau lebih kelas</span>
+              </label>
+              <div className="flex flex-wrap gap-2 p-4 bg-muted/30 border border-border rounded-2xl">
+                {listKelas.map((k) => {
+                  const isSelected = selectedKelasIds.includes(k.id);
+                  return (
+                    <button
+                      key={k.id}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setSelectedKelasIds(selectedKelasIds.filter(id => id !== k.id));
+                        } else {
+                          setSelectedKelasIds([...selectedKelasIds, k.id]);
+                        }
+                      }}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${isSelected
+                          ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20 scale-105"
+                          : "bg-background text-muted-foreground border-border hover:border-primary/50"
+                        }`}
                     >
-                        <option value="">-- Pilih Ujian & Pengampu --</option>
-                        {listUjian.map((ex) => (
-                            <option key={ex.id} value={ex.id}>
-                            {ex.judul} - [{ex.bankSoal?.guru.user.name || 'Guru'}]
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Ruang */}
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase text-muted-foreground">Lokasi Ruangan</label>
-                    <select
-                        value={ruangId}
-                        onChange={(e) => setRuangId(e.target.value)}
-                        className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all font-medium"
-                    >
-                        <option value="">-- Pilih Ruang --</option>
-                        {listRuang.map((r) => (
-                            <option key={r.id} value={r.id}>
-                                {r.nama} (Kap: {r.kapasitas})
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Pengawas */}
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase text-muted-foreground">Petugas Pengawas</label>
-                    <select
-                        value={pengawasId}
-                        onChange={(e) => setPengawasId(e.target.value)}
-                        className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all font-bold"
-                    >
-                        <option value="">-- Tanpa Pengawas --</option>
-                        {listPengawas.map((p) => (
-                            <option key={p.id} value={p.id}>{p.name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Tanggal */}
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase text-muted-foreground">Hari & Tanggal</label>
-                    <input
-                        type="date"
-                        value={tanggal}
-                        onChange={(e) => setTanggal(e.target.value)}
-                        className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
-                    />
-                </div>
-
-                {/* Waktu */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                        <label className="text-[11px] font-black uppercase text-muted-foreground">Mulai</label>
-                        <input
-                            type="time"
-                            value={jamMulai}
-                            onChange={(e) => setJamMulai(e.target.value)}
-                            className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
-                        />
-                    </div>
-                    <div className="space-y-1.5">
-                        <label className="text-[11px] font-black uppercase text-muted-foreground">Selesai</label>
-                        <input
-                            type="time"
-                            value={jamSelesai}
-                            onChange={(e) => setJamSelesai(e.target.value)}
-                            className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary transition-all"
-                        />
-                    </div>
-                </div>
-
-                {/* Pilih Kelas */}
-                <div className="space-y-3 md:col-span-2">
-                    <label className="text-[11px] font-black uppercase text-muted-foreground flex items-center justify-between">
-                        Peserta Ujian (Kelas)
-                        <span className="normal-case font-medium text-[10px] opacity-70">Pilih satu atau lebih kelas</span>
-                    </label>
-                    <div className="flex flex-wrap gap-2 p-4 bg-muted/30 border border-border rounded-2xl">
-                        {listKelas.map((k) => {
-                            const isSelected = selectedKelasIds.includes(k.id);
-                            return (
-                                <button
-                                    key={k.id}
-                                    type="button"
-                                    onClick={() => {
-                                        if (isSelected) {
-                                            setSelectedKelasIds(selectedKelasIds.filter(id => id !== k.id));
-                                        } else {
-                                            setSelectedKelasIds([...selectedKelasIds, k.id]);
-                                        }
-                                    }}
-                                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
-                                        isSelected 
-                                        ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20 scale-105" 
-                                        : "bg-background text-muted-foreground border-border hover:border-primary/50"
-                                    }`}
-                                >
-                                    {k.nama}
-                                </button>
-                            );
-                        })}
-                    </div>
-                    {selectedKelasIds.length === 0 && (
-                        <p className="text-[10px] text-destructive font-medium animate-pulse">
-                            * Wajib memilih minimal satu kelas agar ujian dapat muncul di akun siswa.
-                        </p>
-                    )}
-                </div>
+                      {k.nama}
+                    </button>
+                  );
+                })}
               </div>
-
-              <div className="pt-6 flex justify-end gap-4">
-                <button
-                    disabled={isPending}
-                    onClick={() => setShowModal(false)}
-                    className="px-6 py-3 border border-border rounded-xl hover:bg-muted transition-colors text-sm font-bold"
-                >
-                    Batalkan
-                </button>
-                <button
-                    disabled={isPending}
-                    onClick={handleSave}
-                    className="px-10 py-3 bg-primary text-primary-foreground rounded-xl hover:shadow-lg hover:shadow-primary/20 transition-all text-sm font-black flex items-center gap-2"
-                >
-                    {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {editingJadwal ? "TERAPKAN PERUBAHAN" : "VALIDASI & SIMPAN"}
-                </button>
-              </div>
+              {selectedKelasIds.length === 0 && (
+                <p className="text-[10px] text-destructive font-medium animate-pulse">
+                  * Wajib memilih minimal satu kelas agar ujian dapat muncul di akun siswa.
+                </p>
+              )}
             </div>
           </div>
+
+          <div className="pt-6 flex justify-end gap-4">
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setShowModal(false)}
+              className="px-6 py-3 border border-border rounded-xl hover:bg-muted transition-colors text-sm font-bold"
+            >
+              Batalkan
+            </button>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={handleSave}
+              className="px-10 py-3 bg-primary text-primary-foreground rounded-xl hover:shadow-lg hover:shadow-primary/20 transition-all text-sm font-black flex items-center gap-2"
+            >
+              {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+              {editingJadwal ? "TERAPKAN PERUBAHAN" : "VALIDASI & SIMPAN"}
+            </button>
+          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }
