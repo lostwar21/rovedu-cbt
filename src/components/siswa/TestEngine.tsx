@@ -225,12 +225,22 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
     setAnswers(initialAnswers);
   }, [jawabanExist]);
 
+  const handleAutoSubmit = useCallback(async () => {
+    setIsSubmitting(true);
+    try {
+      await submitUjianAction(sesi.id);
+      router.push('/siswa/ujian');
+    } catch (err) {
+      console.error("Auto-submit failed", err);
+    }
+  }, [sesi.id, router]);
+
   // Timer logic
   useEffect(() => {
     if (sessionStatus !== "BERJALAN" || isSubmitting) return;
 
     const interval = setInterval(() => {
-      setTimeLeft((prev) => {
+      setTimeLeft((prev: number) => {
         if (prev <= 1) {
           clearInterval(interval);
           handleAutoSubmit();
@@ -250,15 +260,7 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
     return `${h > 0 ? h + ":" : ""}${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleAutoSubmit = useCallback(async () => {
-    setIsSubmitting(true);
-    try {
-      await submitUjianAction(sesi.id);
-      router.push('/siswa/ujian');
-    } catch (err) {
-      console.error("Auto-submit failed", err);
-    }
-  }, [sesi.id, router]);
+
 
   const handleSaveAnswer = async (soalId: string, data: { opsiId?: string; essay?: string; ragu?: boolean }) => {
     const newAnswers = {
