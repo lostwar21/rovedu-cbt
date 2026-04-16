@@ -2,7 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { TingkatKesulitan } from "@prisma/client";
+// Import dihapus untuk mencegah runtime crash jika client stale
+// import { TingkatKesulitan } from "@prisma/client";
 
 export async function importSoalExcelAction(
     bankSoalId: string, 
@@ -11,7 +12,7 @@ export async function importSoalExcelAction(
         gambar: string | null;
         tipe: "PG" | "ESSAY";
         bobot: number;
-        tingkatKesulitan: TingkatKesulitan;
+        tingkatKesulitan: "MUDAH" | "SEDANG" | "SULIT";
         taksonomi: string;
         kompetensiDasar: string;
         acakOpsi: boolean;

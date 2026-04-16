@@ -504,16 +504,16 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
                         </div>
                         
                         <div className="pl-11 text-foreground whitespace-pre-wrap text-sm leading-relaxed max-w-4xl">
-                            {s.teks}
+                            {s?.teks || ""}
                         </div>
 
                         {/* Menampilkan Opsi Untuk PG */}
-                        {s.tipe === 'PG' && s.opsi && s.opsi.length > 0 && (
+                        {s?.tipe === 'PG' && s?.opsi && s?.opsi.length > 0 && (
                             <div className="mt-4 pl-11 grid grid-cols-1 md:grid-cols-2 gap-2 max-w-4xl">
                                 {s.opsi.map((o:any, i:number) => (
-                                     <div key={o.id} className={`p-2 rounded border text-sm flex items-start gap-2 ${o.benar ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300' : 'border-border/60 bg-muted/20 text-muted-foreground'}`}>
+                                     <div key={o?.id || i} className={`p-2 rounded border text-sm flex items-start gap-2 ${o?.benar ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300' : 'border-border/60 bg-muted/20 text-muted-foreground'}`}>
                                           <div className="font-bold flex-shrink-0">{String.fromCharCode(65 + i)}.</div>
-                                          <div>{o.teks}</div>
+                                          <div>{o?.teks || ""}</div>
                                      </div>
                                 ))}
                             </div>

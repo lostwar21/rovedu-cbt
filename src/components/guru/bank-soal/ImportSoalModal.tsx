@@ -270,7 +270,11 @@ export function ImportSoalModal({ bankSoalId, onClose }: Props) {
           }, 1500);
         }
       } catch (err: any) {
-        setError(err.message || "Gagal mengimpor soal.");
+        console.error("Import error detail:", err);
+        const errorMessage = typeof err === 'object' ? 
+          (err.message || JSON.stringify(err)) : 
+          String(err);
+        setError("Gagal mengimpor soal: " + errorMessage);
       }
     });
   };
