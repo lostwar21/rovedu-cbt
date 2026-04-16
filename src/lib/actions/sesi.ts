@@ -289,7 +289,8 @@ export async function submitUjianAction(sesiId: string) {
   });
 
   const totalBobotPg = soalPGStr.reduce((acc, curr) => acc + curr.bobot, 0);
-  const nilaiPg = totalBobotPg > 0 ? (correctPg / totalBobotPg) * 100 : 0;
+  const rawNilaiPg = totalBobotPg > 0 ? (correctPg / totalBobotPg) * 100 : 0;
+  const nilaiPg = Number(rawNilaiPg.toFixed(2));
 
   // 2. Tandai Sesi Selesai
   await prisma.$transaction([
@@ -502,7 +503,8 @@ export async function forceSubmitSesiAction(sesiId: string) {
   });
 
   const totalBobotPg = soalPG.reduce((acc, curr) => acc + curr.bobot, 0);
-  const nilaiPg = totalBobotPg > 0 ? (correctPg / totalBobotPg) * 100 : 0;
+  const rawNilaiPg = totalBobotPg > 0 ? (correctPg / totalBobotPg) * 100 : 0;
+  const nilaiPg = Number(rawNilaiPg.toFixed(2));
 
   await prisma.$transaction([
     prisma.sesiUjian.update({
@@ -619,7 +621,7 @@ export async function updateEssayScoreAction(data: {
       where: { id: hasil.id },
       data: {
         nilaiEssay: totalNilaiEssay,
-        nilaiTotal: hasil.nilaiPg + totalNilaiEssay
+        nilaiTotal: Number((hasil.nilaiPg + totalNilaiEssay).toFixed(2))
       }
     });
   }

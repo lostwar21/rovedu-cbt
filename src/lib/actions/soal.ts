@@ -27,6 +27,12 @@ export async function createSoalPG(bankSoalId: string, data: any) {
             teks: data.teks,
             tipe: "PG",
             bobot: parseInt(data.bobot) || 1,
+            kategori: data.kategori || null,
+            kompetensiDasar: data.kompetensiDasar || null,
+            tingkatKesulitan: data.tingkatKesulitan || "SEDANG",
+            taksonomi: data.taksonomi || null,
+            acakOpsi: data.acakOpsi ?? true,
+            gambar: data.gambar || null,
             opsi: {
                 create: data.opsi.map((o: any) => ({
                     teks: o.teks,
@@ -46,6 +52,12 @@ export async function createSoalEssay(bankSoalId: string, data: any) {
             teks: data.teks,
             tipe: "ESSAY",
             bobot: parseInt(data.bobot) || 1,
+            kategori: data.kategori || null,
+            kompetensiDasar: data.kompetensiDasar || null,
+            tingkatKesulitan: data.tingkatKesulitan || "SEDANG",
+            taksonomi: data.taksonomi || null,
+            acakOpsi: false,
+            gambar: data.gambar || null,
         }
     });
     revalidatePath(`/guru/bank-soal/${bankSoalId}`);
@@ -63,6 +75,12 @@ export async function updateSoalPG(bankSoalId: string, soalId: string, data: any
             data: {
                 teks: data.teks,
                 bobot: parseInt(data.bobot) || 1,
+                kategori: data.kategori || null,
+                kompetensiDasar: data.kompetensiDasar || null,
+                tingkatKesulitan: data.tingkatKesulitan || "SEDANG",
+                taksonomi: data.taksonomi || null,
+                acakOpsi: data.acakOpsi ?? true,
+                gambar: data.gambar || null,
                 opsi: {
                     create: data.opsi.map((o: any) => ({
                         teks: o.teks,
@@ -82,6 +100,11 @@ export async function updateSoalEssay(bankSoalId: string, soalId: string, data: 
         data: {
             teks: data.teks,
             bobot: parseInt(data.bobot) || 1,
+            kategori: data.kategori || null,
+            kompetensiDasar: data.kompetensiDasar || null,
+            tingkatKesulitan: data.tingkatKesulitan || "SEDANG",
+            taksonomi: data.taksonomi || null,
+            gambar: data.gambar || null,
         }
     });
     revalidatePath(`/guru/bank-soal/${bankSoalId}`);

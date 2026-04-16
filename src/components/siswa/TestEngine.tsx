@@ -39,6 +39,7 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
   const [unlockToken, setUnlockToken] = useState("");
   const [unlockError, setUnlockError] = useState("");
   const [violationCount, setViolationCount] = useState(0);
+  const [isBlurred, setIsBlurred] = useState(false);
 
   // Helper: Blokir sesi dengan alasan
   const triggerBlock = useCallback((alasan: string) => {
@@ -86,9 +87,15 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
       triggerBlock("Siswa menekan tombol KEMBALI (Back) di browser.");
     };
 
-    // ── Layer 5: Window Blur (Kehilangan Fokus — Agresif) ──
+    // ── Layer 5: Window Blur (Kehilangan Fokus — Mitigasi Shield) ──
     const handleBlur = () => {
-      triggerBlock("Layar kehilangan fokus (membuka panel notifikasi/aplikasi/split-screen).");
+      setIsBlurred(true);
+      // Catatan: Tidak lagi triggerBlock langsung di sini untuk mendukung pemutaran video
+      // Blokir tetap dilakukan via VisibilityChange dan FullscreenChange
+    };
+
+    const handleFocus = () => {
+      setIsBlurred(false);
     };
 
     // ── Layer 6: Blokir Keyboard Shortcut Berbahaya ──
@@ -109,6 +116,9 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
         e.key === "F11",                   // Toggle Fullscreen
         // Screenshot
         e.key === "PrintScreen",
+        (e.metaKey && e.shiftKey && e.key === "3"), // Mac Full Screenshot
+        (e.metaKey && e.shiftKey && e.key === "4"), // Mac Partial Screenshot
+        (e.metaKey && e.shiftKey && e.key === "5"), // Mac Video Record
         // Escape
         e.key === "Escape",
       ];
@@ -149,6 +159,7 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
     window.addEventListener("beforeunload", handleBeforeUnload);
     window.addEventListener("popstate", handlePopState);
     window.addEventListener("blur", handleBlur);
+    window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     document.addEventListener("keydown", handleKeyDown, true); // capture phase
@@ -166,6 +177,7 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener("keydown", handleKeyDown, true);
@@ -414,7 +426,35 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+      
+      {/* 🛡️ SCREEN SHIELD (Cegah Screenshot saat Blur) */}
+      {isBlurred && sessionStatus === "BERJALAN" && (
+        <div className="fixed inset-0 bg-background/90 backdrop-blur-xl z-[9999] flex flex-col items-center justify-center p-6 text-center">
+            <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6 animate-pulse">
+                <Lock className="w-10 h-10" />
+            </div>
+            <h2 className="text-3xl font-black mb-2">Layar Terkunci sementara</h2>
+            <p className="text-muted-foreground max-w-sm">
+                Konten disembunyikan karena layar kehilangan fokus. 
+                Klik kembali ke area ini untuk melanjutkan ujian.
+            </p>
+            <div className="mt-8 px-4 py-2 bg-muted rounded-full text-xs font-mono">
+                SAFETY_MODE: SHIELD_ACTIVE
+            </div>
+        </div>
+      )}
+
+      {/* 💧 WATERMARK (Deterrent Screenshot) */}
+      <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.03] overflow-hidden select-none" aria-hidden="true">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div key={i} className="flex whitespace-nowrap gap-10 -rotate-12 mb-20 text-4xl font-black uppercase">
+            {Array.from({ length: 10 }).map((_, j) => (
+              <span key={j}>{sesi.siswaName || 'PESERTA'} - {sesi.id.slice(-5)} - {new Date().toLocaleDateString()}</span>
+            ))}
+          </div>
+        ))}
+      </div>
 
       {/* Header Bar */}
       <header className="h-16 border-b border-border bg-card sticky top-0 z-50 px-4 md:px-8 flex items-center justify-between shadow-sm">
