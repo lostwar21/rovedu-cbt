@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 
 export async function getGuruId(userId: string) {
+  const session = await auth();
+  if (session?.user?.role === 'ADMIN') return "admin";
+
   const guru = await prisma.guru.findUnique({ where: { userId } });
   return guru?.id;
 }

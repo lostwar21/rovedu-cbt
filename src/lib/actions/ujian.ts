@@ -68,6 +68,22 @@ export async function getDataFormUjian() {
   const session = await auth();
   if (!session?.user?.id) return null;
 
+  if (session.user.role === "ADMIN") {
+    const allBankSoal = await prisma.bankSoal.findMany({
+      include: { mataPelajaran: true, _count: { select: { soal: true } } },
+      orderBy: { nama: 'asc' }
+    });
+    const allKelas = await prisma.kelas.findMany({
+      include: { tahunAjaran: true },
+      orderBy: [{ tahunAjaran: { aktif: 'desc' } }, { nama: 'asc' }]
+    });
+
+    return { 
+      guru: { id: "admin", bankSoal: allBankSoal }, 
+      kelas: allKelas 
+    };
+  }
+
   const guru = await prisma.guru.findUnique({
     where: { userId: session.user.id },
     include: {
