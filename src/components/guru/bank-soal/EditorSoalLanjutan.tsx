@@ -76,11 +76,19 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
     setEditingSoal(s);
     setTeks(s.teks || "");
     setBobot(String(s.bobot || 1));
-    // Untuk PG, pre-fill opsi jawaban
-    if (s.tipe === "PG" && s.opsi) {
-      setOpsi(s.opsi.map((o: any) => ({ teks: o.teks, benar: o.benar })));
+    setTingkatKesulitan(s.tingkatKesulitan || "SEDANG");
+    setTaksonomi(s.taksonomi || "");
+    setKompetensiDasar(s.kompetensiDasar || "");
+    
+    if (s.tipe === "PG") {
+      setAcakOpsi(s.acakOpsi ?? true);
+      if (s.opsi) {
+        setOpsi(s.opsi.map((o: any) => ({ teks: o.teks, benar: o.benar })));
+      }
       setMode("ADD_PG");
     } else {
+      setRubrikPenilaian(s.rubrikPenilaian || "");
+      setIzinkanLampiran(s.izinkanLampiran || false);
       setMode("ADD_ESSAY");
     }
   };
@@ -119,7 +127,15 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
     startTransition(async () => {
         try {
             if (editingSoal) {
-                await updateSoalPG(bankSoal.id, editingSoal.id, { teks, bobot, opsi });
+                await updateSoalPG(bankSoal.id, editingSoal.id, { 
+                  teks, 
+                  bobot, 
+                  tingkatKesulitan, 
+                  taksonomi, 
+                  kompetensiDasar, 
+                  acakOpsi, 
+                  opsi 
+                });
             } else {
                 await createSoalPG(bankSoal.id, { teks, bobot, tingkatKesulitan, taksonomi, kompetensiDasar, acakOpsi, opsi });
             }
@@ -139,7 +155,15 @@ export function EditorSoalLanjutan({ bankSoal }: Props) {
     startTransition(async () => {
         try {
             if (editingSoal) {
-                await updateSoalEssay(bankSoal.id, editingSoal.id, { teks, bobot });
+                await updateSoalEssay(bankSoal.id, editingSoal.id, { 
+                  teks, 
+                  bobot,
+                  tingkatKesulitan,
+                  taksonomi,
+                  kompetensiDasar,
+                  rubrikPenilaian,
+                  izinkanLampiran
+                });
             } else {
                 await createSoalEssay(bankSoal.id, { teks, bobot, tingkatKesulitan, taksonomi, kompetensiDasar, rubrikPenilaian, izinkanLampiran });
             }

@@ -192,3 +192,10 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
 ::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground/40; }
+
+/* ===== SECURITY: ANTI-PRINT ===== */
+@media print {
+  body {
+    display: none !important;
+  }
+}

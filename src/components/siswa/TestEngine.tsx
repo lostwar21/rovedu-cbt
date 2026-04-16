@@ -89,9 +89,14 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
 
     // ── Layer 5: Window Blur (Kehilangan Fokus — Mitigasi Shield) ──
     const handleBlur = () => {
-      setIsBlurred(true);
-      // Catatan: Tidak lagi triggerBlock langsung di sini untuk mendukung pemutaran video
-      // Blokir tetap dilakukan via VisibilityChange dan FullscreenChange
+      // Tunggu sebentar untuk memastikan fokus benar-benar pindah ke luar, bukan ke iframe video
+      setTimeout(() => {
+        const activeEl = document.activeElement;
+        if (activeEl && activeEl.tagName === "IFRAME") {
+          return; // Fokus di video, jangan aktifkan shield
+        }
+        setIsBlurred(true);
+      }, 100);
     };
 
     const handleFocus = () => {

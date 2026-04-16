@@ -30,9 +30,13 @@ export default async function UjianResultPage({
   // Kalkulasi Statistik
   const finishedSesi = listSesi.filter(s => s.status === 'SELESAI');
   const totalNilai = finishedSesi.reduce((acc, curr) => acc + (curr.hasil?.nilaiTotal || 0), 0);
-  const avgNilai = finishedSesi.length > 0 ? (totalNilai / finishedSesi.length).toFixed(1) : 0;
-  const maxNilai = finishedSesi.length > 0 ? Math.max(...finishedSesi.map(s => s.hasil?.nilaiTotal || 0)) : 0;
-  const minNilai = finishedSesi.length > 0 ? Math.min(...finishedSesi.map(s => s.hasil?.nilaiTotal || 0)) : 0;
+  const avgNilai = finishedSesi.length > 0 ? (totalNilai / finishedSesi.length).toFixed(1) : "0.0";
+  
+  const rawMax = finishedSesi.length > 0 ? Math.max(...finishedSesi.map(s => s.hasil?.nilaiTotal || 0)) : 0;
+  const rawMin = finishedSesi.length > 0 ? Math.min(...finishedSesi.map(s => s.hasil?.nilaiTotal || 0)) : 0;
+  const maxNilai = Number(rawMax).toFixed(1);
+  const minNilai = Number(rawMin).toFixed(1);
+
   const passedCount = finishedSesi.filter(s => (s.hasil?.nilaiTotal || 0) >= 75).length; // KKM 75 asumsi
 
   return (
@@ -119,7 +123,7 @@ export default async function UjianResultPage({
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
                       <span className="text-sm font-black text-primary">
-                        {sesi.hasil?.nilaiTotal || 0}
+                        {(sesi.hasil?.nilaiTotal || 0).toFixed(1)}
                       </span>
                       {sesi.hasil?.nilaiEssay === 0 && (
                         <span className="text-[9px] text-amber-500 font-bold flex items-center gap-1 uppercase">
