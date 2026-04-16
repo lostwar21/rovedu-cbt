@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { StatusUjian } from "@prisma/client";
 import Link from "next/link";
 import { SystemHealthMonitor } from "@/components/admin/SystemHealthMonitor";
+import { formatWIBTime } from "@/lib/date-utils";
 
 export default async function AdminDashboard() {
   const now = new Date();
