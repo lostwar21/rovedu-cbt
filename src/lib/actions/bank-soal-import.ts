@@ -2,9 +2,12 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-// Import dihapus untuk mencegah runtime crash jika client stale
-// import { TingkatKesulitan } from "@prisma/client";
 
+/**
+ * Hyper-Safe Import Action
+ * Fungsi ini tidak akan pernah melakukan 'throw error' secara fatal.
+ * Ia selalu mengembalikan objek JSON murni: { success, count, error }
+ */
 export async function importSoalExcelAction(
     bankSoalId: string, 
     soalData: Array<{
@@ -19,13 +22,16 @@ export async function importSoalExcelAction(
         opsi?: Array<{ teks: string; benar: boolean }>;
     }>
 ) {
+    console.log(`[IMPORT] Memulai proses import untuk Bank Soal ID: ${bankSoalId}. Total soal: ${soalData?.length}`);
+
     if (!bankSoalId || !soalData || soalData.length === 0) {
-        throw new Error("Data soal tidak valid atau kosong.");
+        return { success: false, count: 0, error: "Data soal tidak valid atau kosong." };
     }
 
     try {
-        // Lakukan import dalam satu transaksi untuk menjamin integritas data
-        await prisma.$transaction(async (tx) => {
+        // Gunakan timeout dan transaksi yang lebih terisolasi
+        const result = await prisma.$transaction(async (tx) => {
+            let createCount = 0;
             for (const soal of soalData) {
                 if (soal.tipe === "PG") {
                     await tx.soal.create({
@@ -33,7 +39,7 @@ export async function importSoalExcelAction(
                             bankSoalId,
                             tipe: "PG",
                             teks: soal.teks,
-                            bobot: soal.bobot || 1,
+                            bobot: Number(soal.bobot) || 1,
                             tingkatKesulitan: soal.tingkatKesulitan || "SEDANG",
                             taksonomi: soal.taksonomi || "",
                             kompetensiDasar: soal.kompetensiDasar || "",
@@ -53,7 +59,7 @@ export async function importSoalExcelAction(
                             bankSoalId,
                             tipe: "ESSAY",
                             teks: soal.teks,
-                            bobot: soal.bobot || 1,
+                            bobot: Number(soal.bobot) || 1,
                             tingkatKesulitan: soal.tingkatKesulitan || "SEDANG",
                             taksonomi: soal.taksonomi || "",
                             kompetensiDasar: soal.kompetensiDasar || "",
@@ -61,19 +67,38 @@ export async function importSoalExcelAction(
                         }
                     });
                 }
+                createCount++;
             }
+            return createCount;
+        }, {
+            timeout: 30000 // Berikan waktu 30 detik untuk transaksi besar
         });
 
-        revalidatePath(`/guru/bank-soal/${bankSoalId}`);
-        return { success: true, count: soalData.length };
-    } catch (error: any) {
-        console.error("Error importing soal:", error);
-        
-        let customMessage = error.message;
-        if (error.code === 'P2021' || error.message?.includes('column')) {
-            customMessage = "Struktur database belum siap. Mohon jalankan 'npx prisma db push' di terminal.";
+        console.log(`[IMPORT] Transaksi Berhasil. ${result} soal dibuat.`);
+
+        // Revalidasi di luar transaksi
+        try {
+            revalidatePath(`/guru/bank-soal/${bankSoalId}`);
+        } catch (revalidateError) {
+            console.error("[IMPORT] Gagal revalidatePath, tapi data sudah masuk:", revalidateError);
         }
+
+        return { success: true, count: result };
+
+    } catch (error: any) {
+        console.error("[IMPORT] KESALAHAN FATAL:", error);
         
-        throw new Error("Gagal mengimport soal: " + customMessage);
+        let msg = error?.message || "Terjadi kesalahan internal pada server.";
+        if (error?.code === 'P2021' || msg.includes('column')) {
+            msg = "Struktur database tidak sinkron. Mohon jalankan 'npx prisma db push'.";
+        } else if (msg.includes('serialize')) {
+            msg = "Gagal mengirimkan data dari server ke browser (Serialization Error).";
+        }
+
+        return { 
+            success: false, 
+            count: 0, 
+            error: msg
+        };
     }
 }

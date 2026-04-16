@@ -262,12 +262,15 @@ export function ImportSoalModal({ bankSoalId, onClose }: Props) {
       try {
         setError("");
         const result = await importSoalExcelAction(bankSoalId, parsedData);
-        if (result?.success) {
+        
+        if (result.success) {
           setSuccess(`${result.count} soal berhasil diimpor!`);
           setTimeout(() => {
             router.refresh();
             onClose();
           }, 1500);
+        } else {
+          setError(result.error || "Gagal mengimpor soal karena alasan teknis.");
         }
       } catch (err: any) {
         console.error("Import error detail:", err);
