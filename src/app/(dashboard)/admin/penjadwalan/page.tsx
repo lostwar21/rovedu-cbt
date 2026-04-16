@@ -21,7 +21,7 @@ export default async function AdminPenjadwalanPage() {
     getAllJadwalAction(),
     getRuangUjian(),
     getAllUjianAction(),
-    getPengguna("PENGAWAS"), // Dari pengguna.ts
+    getPengguna(["PENGAWAS", "GURU"]), // Ambil akun Admin & Pengawas gabungan
     getKelas(),
   ]);
 

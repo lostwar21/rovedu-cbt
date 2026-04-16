@@ -6,8 +6,18 @@ import { revalidatePath } from "next/cache";
 import * as bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
 
-export async function getPengguna(role?: Role) {
-  const where = role ? { role } : { role: { not: "ADMIN" as Role } };
+export async function getPengguna(role?: Role | Role[]) {
+  let where = {};
+  
+  if (role) {
+    if (Array.isArray(role)) {
+      where = { role: { in: role } };
+    } else {
+      where = { role };
+    }
+  } else {
+    where = { role: { not: "ADMIN" as Role } };
+  }
   
   return await prisma.user.findMany({
     where,

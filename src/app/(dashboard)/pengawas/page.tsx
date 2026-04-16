@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export default async function PengawasDashboard() {
   const session = await auth();
-  if (!session?.user?.id || (session.user.role !== "PENGAWAS" && session.user.role !== "ADMIN")) {
+  if (!session?.user?.id || (session.user.role !== "PENGAWAS" && session.user.role !== "ADMIN" && session.user.role !== "GURU")) {
     return <div className="p-8 text-center text-muted-foreground">Akses Ditolak.</div>;
   }
 

@@ -55,6 +55,7 @@ const MENUS = {
         { name: "Manajemen Ujian", href: "/guru/ujian", icon: FileText },
         { name: "Jadwal Ujian", href: "/guru/jadwal", icon: Activity },
         { name: "Nilai & Rekap", href: "/guru/penilaian", icon: ClipboardList },
+        { name: "Monitoring (Pengawas)", href: "/pengawas", icon: Monitor },
     ],
     PENGAWAS: [
         { name: "Dashboard", href: "/pengawas", icon: Home },

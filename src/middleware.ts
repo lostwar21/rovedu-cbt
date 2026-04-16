@@ -27,7 +27,7 @@ export default auth((req) => {
     if (nextUrl.pathname.startsWith("/guru") && userRole !== "GURU" && userRole !== "ADMIN") {
         return NextResponse.redirect(new URL(`/${userRole?.toLowerCase()}`, nextUrl));
     }
-    if (nextUrl.pathname.startsWith("/pengawas") && userRole !== "PENGAWAS" && userRole !== "ADMIN") {
+    if (nextUrl.pathname.startsWith("/pengawas") && userRole !== "PENGAWAS" && userRole !== "ADMIN" && userRole !== "GURU") {
         return NextResponse.redirect(new URL(`/${userRole?.toLowerCase()}`, nextUrl));
     }
     if (nextUrl.pathname.startsWith("/siswa") && userRole !== "SISWA" && userRole !== "ADMIN") {
