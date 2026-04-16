@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useTransition } from "react";
-import { Plus, Edit2, Trash2, X, Loader2, BookOpen, Layers } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Loader2, BookOpen, Layers, Search, Filter } from "lucide-react";
 import { createBankSoal, updateBankSoal, deleteBankSoal } from "@/lib/actions/bank-soal";
 import Link from "next/link";
 
@@ -32,6 +32,16 @@ export function BankSoalTable({ data, listMapel, guruId }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<BankSoal | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // Filter State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMapel, setSelectedMapel] = useState<string>("all");
+
+  const filteredData = data.filter(item => {
+    const matchesSearch = item.nama.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesMapel = selectedMapel === "all" || item.mataPelajaranId === selectedMapel;
+    return matchesSearch && matchesMapel;
+  });
 
   const handleOpenModal = (item?: BankSoal) => {
     setEditingItem(item || null);
@@ -81,6 +91,43 @@ export function BankSoalTable({ data, listMapel, guruId }: Props) {
         </button>
       </div>
 
+      {/* Filter & Search Bar */}
+      <div className="flex flex-col md:flex-row gap-4 items-center bg-muted/30 p-4 rounded-xl border border-border/50">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input 
+            type="text"
+            placeholder="Cari nama bank soal..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+          />
+        </div>
+        
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <select
+            value={selectedMapel}
+            onChange={(e) => setSelectedMapel(e.target.value)}
+            className="flex-1 md:w-60 px-3 py-2 bg-background border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+          >
+            <option value="all">Semua Mata Pelajaran</option>
+            {listMapel.map(m => (
+              <option key={m.id} value={m.id}>{m.nama}</option>
+            ))}
+          </select>
+        </div>
+
+        {(searchQuery || selectedMapel !== "all") && (
+          <button 
+            onClick={() => { setSearchQuery(""); setSelectedMapel("all"); }}
+            className="text-xs text-muted-foreground hover:text-primary transition-colors font-medium underline underline-offset-4"
+          >
+            Reset Filter
+          </button>
+        )}
+      </div>
+
       <div className="glass rounded-[var(--radius-lg)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -93,14 +140,16 @@ export function BankSoalTable({ data, listMapel, guruId }: Props) {
               </tr>
             </thead>
             <tbody className="text-sm">
-              {data.length === 0 ? (
+              {filteredData.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-12 text-center text-muted-foreground">
-                    Belum ada bank soal. Silakan buat baru.
+                    {searchQuery || selectedMapel !== "all" 
+                      ? "Tidak ada bank soal yang cocok dengan filter Anda." 
+                      : "Belum ada bank soal. Silakan buat baru."}
                   </td>
                 </tr>
               ) : (
-                data.map((item) => (
+                filteredData.map((item) => (
                   <tr key={item.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                     <td className="py-4 px-6">
                       <div className="font-bold text-foreground text-base">{item.nama}</div>
