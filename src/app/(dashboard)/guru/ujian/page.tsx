@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 export default async function ManajemenUjianPage() {
   const session = await auth();
 
-  if (!session?.user || session.user.role !== "GURU") {
+  if (!session?.user || (session.user.role !== "GURU" && session.user.role !== "ADMIN")) {
     return redirect("/login");
   }
 

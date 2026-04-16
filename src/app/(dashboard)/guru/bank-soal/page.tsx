@@ -6,7 +6,7 @@ export default async function BankSoalPage() {
   const session = await auth();
 
   // Pastikan yang login adalah tipe GURU dan memiliki ID
-  if (!session?.user?.id || session.user.role !== "GURU") {
+  if (!session?.user?.id || (session.user.role !== "GURU" && session.user.role !== "ADMIN")) {
     return <div className="p-8 text-center text-muted-foreground">Anda tidak memiliki akses ke halaman ini.</div>;
   }
 

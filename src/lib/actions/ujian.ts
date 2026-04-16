@@ -9,6 +9,24 @@ export async function getUjianByGuru() {
   const session = await auth();
   if (!session?.user?.id) return [];
 
+  // Jika ADMIN, berikan akses ke seluruh ujian
+  if (session.user.role === 'ADMIN') {
+    return await prisma.ujian.findMany({
+      include: {
+        mataPelajaran: { select: { id: true, nama: true } },
+        bankSoal: { 
+          include: { 
+            guru: { include: { user: { select: { name: true } } } } 
+          } 
+        },
+        kelas: { select: { id: true, nama: true } },
+        jadwal: { select: { waktuMulai: true, waktuSelesai: true } },
+        _count: { select: { attempts: true } }
+      },
+      orderBy: { id: 'desc' }
+    });
+  }
+
   const guru = await prisma.guru.findUnique({
     where: { userId: session.user.id },
     select: { id: true }

@@ -10,8 +10,33 @@ export async function getRuangUjian() {
   });
 }
 
+import { auth } from "@/auth";
+
 // Mengambil jadwal ujian untuk guru tertentu (berdasarkan ujian yang dibuat guru tersebut)
 export async function getJadwalByGuru(guruId: string) {
+  const session = await auth();
+
+  // Jika ADMIN, berikan akses ke seluruh jadwal
+  if (session?.user?.role === 'ADMIN') {
+    return await prisma.jadwalUjian.findMany({
+      include: {
+        ujian: {
+          include: {
+            mataPelajaran: true,
+            bankSoal: { 
+              include: { 
+                guru: { include: { user: { select: { name: true } } } } 
+              } 
+            }
+          },
+        },
+        ruang: true,
+        kelas: { select: { id: true, nama: true } },
+      },
+      orderBy: { waktuMulai: "asc" },
+    });
+  }
+
   return await prisma.jadwalUjian.findMany({
     where: {
       ujian: {
@@ -35,6 +60,29 @@ export async function getJadwalByGuru(guruId: string) {
 
 // Mengambil jadwal ujian untuk pengawas tertentu
 export async function getJadwalByPengawas(pengawasId: string) {
+  const session = await auth();
+
+  // Jika ADMIN, berikan akses ke seluruh jadwal (Monitoring global)
+  if (session?.user?.role === 'ADMIN') {
+    return await prisma.jadwalUjian.findMany({
+      include: {
+        ujian: {
+          include: {
+            mataPelajaran: true,
+            bankSoal: { 
+              include: { 
+                guru: { include: { user: { select: { name: true } } } } 
+              } 
+            }
+          },
+        },
+        ruang: true,
+        kelas: { select: { id: true, nama: true } },
+      },
+      orderBy: { waktuMulai: "asc" },
+    });
+  }
+
   return await prisma.jadwalUjian.findMany({
     where: {
       pengawasId: pengawasId,

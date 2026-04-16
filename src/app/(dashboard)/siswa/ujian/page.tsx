@@ -6,7 +6,7 @@ import { DaftarUjianSiswa } from "@/components/siswa/DaftarUjianSiswa";
 export default async function SiswaUjianPage() {
   const session = await auth();
 
-  if (!session?.user || session.user.role !== "SISWA") {
+  if (!session?.user || (session.user.role !== "SISWA" && session.user.role !== "ADMIN")) {
     return redirect("/login");
   }
 

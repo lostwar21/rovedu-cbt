@@ -6,8 +6,8 @@ import { redirect } from "next/navigation";
 
 export default async function PengawasDashboard() {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "PENGAWAS") {
-    // Jika admin/guru masuk dashboard pengawas, biarkan saja atau sesuaikan
+  if (!session?.user?.id || (session.user.role !== "PENGAWAS" && session.user.role !== "ADMIN")) {
+    return <div className="p-8 text-center text-muted-foreground">Akses Ditolak.</div>;
   }
 
   const listJadwal = await getJadwalByPengawas(session?.user?.id as string);

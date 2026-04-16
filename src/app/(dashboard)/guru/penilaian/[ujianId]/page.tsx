@@ -12,8 +12,8 @@ export default async function UjianResultPage({
   params: Promise<{ ujianId: string }> 
 }) {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "GURU") {
-    redirect("/login");
+  if (!session?.user?.id || (session.user.role !== "GURU" && session.user.role !== "ADMIN")) {
+    return <div className="p-8 text-center text-muted-foreground">Akses Ditolak.</div>;
   }
 
   const { ujianId } = await params;

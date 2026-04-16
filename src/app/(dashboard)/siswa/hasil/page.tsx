@@ -5,7 +5,7 @@ import { ClipboardList, Star, Calendar, CheckCircle } from "lucide-react";
 
 export default async function HasilUjianSiswaPage() {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "SISWA") {
+  if (!session?.user?.id || (session.user.role !== "SISWA" && session.user.role !== "ADMIN")) {
     redirect("/login");
   }
 

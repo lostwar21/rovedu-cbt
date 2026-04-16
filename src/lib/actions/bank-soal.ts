@@ -9,6 +9,13 @@ export async function getGuruId(userId: string) {
 }
 
 export async function getMapelByGuru(userId: string) {
+  const session = await auth();
+  
+  // Jika Admin, ambil SEMUA Mata Pelajaran
+  if (session?.user?.role === 'ADMIN') {
+    return await prisma.mataPelajaran.findMany({ orderBy: { nama: 'asc' } });
+  }
+
   const guru = await prisma.guru.findUnique({
     where: { userId },
     include: { mataPelajaran: true }
@@ -17,17 +24,29 @@ export async function getMapelByGuru(userId: string) {
 }
 
 export async function getBankSoalByGuru(guruId: string) {
-    // Fungsi ini bertugas menarik data dari tabel bankSoal
-    // dan menyertakan juga relasi Mata Pelajarannya.
+    const session = await auth();
+
+    // Jika Admin, ambil SEMUA Bank Soal (baik milik mereka sendiri jika ada guruId, maupun milik guru lain)
+    if (session?.user?.role === 'ADMIN') {
+        return await prisma.bankSoal.findMany({
+            include: {
+                mataPelajaran: true,
+                guru: { include: { user: { select: { name: true } } } },
+                _count: { select: { soal: true } }
+            },
+            orderBy: { nama: "asc" },
+        });
+    }
+
     return await prisma.bankSoal.findMany({
         where: { guruId: guruId },
         include: {
             mataPelajaran: true,
             _count: {
-                select: { soal: true } // Menghitung jumlah butir soal di dalamnya
+                select: { soal: true }
             }
         },
-        orderBy: { nama: "asc" }, // Diurutkan sesuai abjad
+        orderBy: { nama: "asc" },
     });
 }
 
