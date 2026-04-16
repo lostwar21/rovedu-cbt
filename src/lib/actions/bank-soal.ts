@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 export async function getGuruId(userId: string) {
   const guru = await prisma.guru.findUnique({ where: { userId } });
