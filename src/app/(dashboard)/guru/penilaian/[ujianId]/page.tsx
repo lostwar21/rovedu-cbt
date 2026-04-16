@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { ChevronLeft, User, BookOpen, Clock, ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
 import { ExportButton } from "@/components/guru/ExportButton";
+import { formatWIBDate } from "@/lib/date-utils";
 
 export default async function UjianResultPage({ 
   params 
@@ -57,7 +58,7 @@ export default async function UjianResultPage({
 
         <ExportButton 
           data={listSesi} 
-          filename={`Rekap_${ujian.judul.replace(/\s+/g, '_')}_${new Date().toLocaleDateString()}`} 
+          filename={`Rekap_${ujian.judul.replace(/\s+/g, '_')}_${formatWIBDate(new Date())}`} 
         />
       </div>
 

@@ -4,6 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Printer, Search, CheckSquare, Square, Filter, Download, Loader2, GraduationCap, UserCircle2 } from "lucide-react";
 import jsPDF from "jspdf";
+import { formatWIBDate } from "@/lib/date-utils";
 
 interface UserData {
   id: string;
@@ -133,7 +134,7 @@ export function CetakKartuManager({ data, listKelas }: Props) {
         }
       });
 
-      doc.save(`Kartu_Login_${filterRole}_${new Date().toLocaleDateString()}.pdf`);
+      doc.save(`Kartu_Login_${filterRole}_${formatWIBDate(new Date())}.pdf`);
     } catch (error) {
       console.error("PDF generation failed", error);
     } finally {

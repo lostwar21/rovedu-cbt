@@ -4,6 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import { ClipboardCheck, Users, Calendar, ArrowRight, Search, Filter } from "lucide-react";
 import Link from "next/link";
+import { formatWIBDate } from "@/lib/date-utils";
 
 interface PenilaianItem {
   id: string;
@@ -118,7 +119,7 @@ export function PenilaianList({ listUjian }: Props) {
                     <span>
                       Dibuat:{" "}
                       {ujian.jadwal[0]?.waktuMulai
-                        ? new Date(ujian.jadwal[0].waktuMulai).toLocaleDateString("id-ID")
+                        ? formatWIBDate(ujian.jadwal[0].waktuMulai, { day: 'numeric', month: 'short', year: 'numeric' })
                         : "-"}
                     </span>
                   </div>

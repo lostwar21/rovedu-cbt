@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { formatWIBTime } from "@/lib/date-utils";
 
 export async function mulaiUjianAction(data: {
   jadwalId: string;
@@ -28,7 +29,7 @@ export async function mulaiUjianAction(data: {
   // 2. Validasi Waktu (Hanya bisa mulai jika sekarang di antara waktuMulai dan waktuSelesai)
   // Berikan toleransi keterlambatan (siswa masih bisa masuk selama waktuSelesai belum lewat)
   if (now < jadwal.waktuMulai) {
-    throw new Error(`Ujian belum dimulai. Silakan tunggu hingga ${jadwal.waktuMulai.toLocaleTimeString()}.`);
+    throw new Error(`Ujian belum dimulai. Silakan tunggu hingga ${formatWIBTime(jadwal.waktuMulai)}.`);
   }
   
   if (now > jadwal.waktuSelesai) {

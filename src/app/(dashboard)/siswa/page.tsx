@@ -1,4 +1,5 @@
 import { FileText, ClipboardList, Clock, CheckCircle, Calendar, ArrowRight } from "lucide-react";
+import { formatWIBTime, formatWIBDate } from "@/lib/date-utils";
 import { auth } from "@/auth";
 import { getDaftarUjianSiswa, getRiwayatHasilSiswa } from "@/lib/actions/siswa-ujian";
 import Link from "next/link";
@@ -101,7 +102,7 @@ export default async function SiswaDashboard() {
                   <h3 className="text-lg font-bold text-foreground">{j.ujian.judul}</h3>
                   <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
                     <Clock className="w-4 h-4" />
-                    {new Date(j.waktuMulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} — {new Date(j.waktuSelesai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} ({j.ujian.durasi} Menit)
+                    {formatWIBTime(j.waktuMulai)} — {formatWIBTime(j.waktuSelesai)} ({j.ujian.durasi} Menit)
                   </p>
                 </div>
                 <div className="flex-shrink-0">

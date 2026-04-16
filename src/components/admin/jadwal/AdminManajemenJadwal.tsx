@@ -18,6 +18,7 @@ import {
   Search,
   CheckCircle2,
 } from "lucide-react";
+import { formatWIBTime, formatWIBDay } from "@/lib/date-utils";
 import { Modal } from "@/components/ui/Modal";
 import {
   createJadwalUjian,
@@ -297,25 +298,16 @@ export function AdminManajemenJadwal({
                 </div>
 
                 <div className="space-y-3 pt-4 border-t border-border/40">
-                  <div className="flex items-center gap-3 text-sm font-medium">
-                    <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-600 flex items-center justify-center">
-                        <Calendar className="w-4 h-4" />
-                    </div>
-                    <span suppressHydrationWarning>
-                      {new Date(j.waktuMulai).toLocaleDateString("id-ID", {
-                        weekday: "short", day: "numeric", month: "short"
-                      })}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="w-4 h-4" />
+                    <span suppressHydrationWarning className="text-foreground">
+                      {formatWIBDay(j.waktuMulai)}
                     </span>
                   </div>
-                  
-                  <div className="flex items-center gap-3 text-sm font-medium">
-                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center">
-                        <Clock className="w-4 h-4" />
-                    </div>
-                    <span suppressHydrationWarning className="tabular-nums">
-                      {new Date(j.waktuMulai).toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'})} 
-                      {" - "}
-                      {new Date(j.waktuSelesai).toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit'})}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4" />
+                    <span suppressHydrationWarning className="font-medium text-foreground">
+                      {formatWIBTime(j.waktuMulai)} - {formatWIBTime(j.waktuSelesai)}
                     </span>
                   </div>
                   

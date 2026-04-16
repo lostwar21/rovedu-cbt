@@ -128,7 +128,7 @@ export default async function AdminDashboard() {
                     </div>
                   </td>
                   <td className="py-4 px-4 text-muted-foreground font-medium tabular-nums">
-                    {new Date(j.waktuMulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} - {new Date(j.waktuSelesai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })}
+                    {formatWIBTime(j.waktuMulai)} - {formatWIBTime(j.waktuSelesai)}
                   </td>
                   <td className="py-4 px-4 text-right">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">

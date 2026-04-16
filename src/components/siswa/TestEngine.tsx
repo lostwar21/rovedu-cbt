@@ -18,6 +18,7 @@ import {
   Maximize
 } from "lucide-react";
 import { simpanJawabanAction, submitUjianAction, blokirSesiAction, resumeSesiAction } from "@/lib/actions/sesi";
+import { formatWIBDate } from "@/lib/date-utils";
 
 interface Props {
   sesi: any;
@@ -455,7 +456,7 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
         {Array.from({ length: 20 }).map((_, i) => (
           <div key={i} className="flex whitespace-nowrap gap-10 -rotate-12 mb-20 text-4xl font-black uppercase">
             {Array.from({ length: 10 }).map((_, j) => (
-              <span key={j}>{sesi.siswaName || 'PESERTA'} - {sesi.id.slice(-5)} - {new Date().toLocaleDateString()}</span>
+              <span key={j}>{sesi.siswaName || 'PESERTA'} - {sesi.id.slice(-5)} - {formatWIBDate(new Date())}</span>
             ))}
           </div>
         ))}

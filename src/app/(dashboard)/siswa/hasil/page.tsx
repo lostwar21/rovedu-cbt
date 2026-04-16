@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getRiwayatHasilSiswa } from "@/lib/actions/siswa-ujian";
 import { ClipboardList, Star, Calendar, CheckCircle } from "lucide-react";
+import { formatWIBDate } from "@/lib/date-utils";
 
 export default async function HasilUjianSiswaPage() {
   const session = await auth();
@@ -73,7 +74,7 @@ export default async function HasilUjianSiswaPage() {
               
               <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                 <Calendar className="w-3.5 h-3.5" />
-                Dikerjakan pada: {new Date(sesi.waktuSelesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                Dikerjakan pada: {formatWIBDate(sesi.waktuSelesai, { day: 'numeric', month: 'short', year: 'numeric' })}
               </div>
             </div>
           </div>

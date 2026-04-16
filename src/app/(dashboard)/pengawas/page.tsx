@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getJadwalByPengawas } from "@/lib/actions/jadwal";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { formatWIBTime } from "@/lib/date-utils";
 
 export default async function PengawasDashboard() {
   const session = await auth();
@@ -106,7 +107,7 @@ export default async function PengawasDashboard() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Waktu:</span>
                     <span className="font-medium">
-                      {jadwal.waktuMulai.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {jadwal.waktuSelesai.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {formatWIBTime(jadwal.waktuMulai)} - {formatWIBTime(jadwal.waktuSelesai)}
                     </span>
                   </div>
                 </div>

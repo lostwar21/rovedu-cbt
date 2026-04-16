@@ -16,6 +16,7 @@ import {
   Search,
   Filter,
 } from "lucide-react";
+import { formatWIBTime, formatWIBDay } from "@/lib/date-utils";
 import { Modal } from "@/components/ui/Modal";
 import {
   createJadwalUjian,
@@ -272,26 +273,13 @@ export function ManajemenJadwal({
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar className="w-4 h-4" />
                   <span suppressHydrationWarning>
-                    {new Date(j.waktuMulai).toLocaleDateString("id-ID", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {formatWIBDay(j.waktuMulai)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
                   <span suppressHydrationWarning className="font-medium text-foreground">
-                    {new Date(j.waktuMulai).toLocaleTimeString("id-ID", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                    {" - "}
-                    {new Date(j.waktuSelesai).toLocaleTimeString("id-ID", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {formatWIBTime(j.waktuMulai)} - {formatWIBTime(j.waktuSelesai)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">

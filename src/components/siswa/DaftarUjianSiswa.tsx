@@ -4,6 +4,7 @@ import * as React from "react";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, Clock, MapPin, Key, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { formatWIBTime, formatWIBDate } from "@/lib/date-utils";
 import { mulaiUjianAction } from "@/lib/actions/sesi";
 import { Modal } from "@/components/ui/Modal";
 
@@ -100,7 +101,7 @@ export function DaftarUjianSiswa({ data }: Props) {
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>
-                        {new Date(j.waktuMulai).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' })}
+                        {formatWIBDate(j.waktuMulai, { day: 'numeric', month: 'short' })}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -142,7 +143,7 @@ export function DaftarUjianSiswa({ data }: Props) {
                     )}
                     {isBelumMulai && (
                       <p className="text-[10px] text-center text-muted-foreground mt-2 italic">
-                        Ujian dimulai pukul {new Date(j.waktuMulai).toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })}
+                        Ujian dimulai pukul {formatWIBTime(j.waktuMulai)}
                       </p>
                     )}
                   </div>
