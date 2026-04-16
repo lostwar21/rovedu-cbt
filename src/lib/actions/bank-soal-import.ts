@@ -67,6 +67,12 @@ export async function importSoalExcelAction(
         return { success: true, count: soalData.length };
     } catch (error: any) {
         console.error("Error importing soal:", error);
-        throw new Error("Gagal mengimport soal: " + error.message);
+        
+        let customMessage = error.message;
+        if (error.code === 'P2021' || error.message?.includes('column')) {
+            customMessage = "Struktur database belum siap. Mohon jalankan 'npx prisma db push' di terminal.";
+        }
+        
+        throw new Error("Gagal mengimport soal: " + customMessage);
     }
 }

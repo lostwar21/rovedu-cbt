@@ -7,16 +7,21 @@ import { revalidatePath } from "next/cache";
 // `prisma db push` selesai. Untuk sementara, hanya field dasar yang dikirim.
 
 export async function getBankSoalLengkap(bankSoalId: string) {
-  return await prisma.bankSoal.findUnique({
-    where: { id: bankSoalId },
-    include: {
-      mataPelajaran: true,
-      soal: {
-        include: { opsi: true },
-        orderBy: { id: 'asc' }
+  try {
+    return await prisma.bankSoal.findUnique({
+      where: { id: bankSoalId },
+      include: {
+        mataPelajaran: true,
+        soal: {
+          include: { opsi: true },
+          orderBy: { id: 'asc' }
+        }
       }
-    }
-  });
+    });
+  } catch (error) {
+    console.error("Gagal memuat Detail Bank Soal:", error);
+    return null;
+  }
 }
 
 // Tambah Soal Pilihan Ganda
