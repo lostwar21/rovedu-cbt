@@ -255,9 +255,8 @@ export async function submitUjianAction(sesiId: string) {
     select: { id: true, status: true, ujianId: true, siswaId: true }
   });
 
-  if (!sesi || sesi.status === "SELESAI") {
-    throw new Error("Sesi tidak ditemukan atau sudah selesai.");
-  }
+  if (!sesi) throw new Error("Sesi tidak ditemukan.");
+  if (sesi.status === "SELESAI") return { success: true };
 
   // VALIDASI FATAL: Mencegah submit ujian orang lain
   if (sesi.siswaId !== siswa.id) {
@@ -294,23 +293,32 @@ export async function submitUjianAction(sesiId: string) {
   const nilaiPg = Number(rawNilaiPg.toFixed(2));
 
   // 2. Tandai Sesi Selesai
-  await prisma.$transaction([
-    prisma.sesiUjian.update({
-      where: { id: sesiId },
-      data: {
-        status: "SELESAI",
-        waktuSelesai: new Date()
-      }
-    }),
-    prisma.hasilUjian.create({
-      data: {
-        siswaId: sesi.siswaId,
-        sesiId: sesi.id,
-        nilaiPg: nilaiPg,
-        nilaiTotal: nilaiPg, // Nilai total awal (belum termasuk essay yang dinilai manual)
-      }
-    })
-  ]);
+  try {
+    await prisma.$transaction([
+      prisma.sesiUjian.update({
+        where: { id: sesiId },
+        data: {
+          status: "SELESAI",
+          waktuSelesai: new Date()
+        }
+      }),
+      prisma.hasilUjian.create({
+        data: {
+          siswaId: sesi.siswaId,
+          sesiId: sesi.id,
+          nilaiPg: nilaiPg,
+          nilaiTotal: nilaiPg, // Nilai total awal (belum termasuk essay yang dinilai manual)
+        }
+      })
+    ]);
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      // Race condition teratasi: Data hasil ujian sudah ada dikarenakan double submit
+      console.log(`[CBT] Abaikan duplicate constraint untuk submit sesi ${sesiId}`);
+    } else {
+      throw error;
+    }
+  }
 
   revalidatePath('/siswa/ujian');
   return { success: true };
@@ -475,9 +483,8 @@ export async function forceSubmitSesiAction(sesiId: string) {
     select: { id: true, status: true, ujianId: true, siswaId: true }
   });
 
-  if (!sesi || sesi.status === "SELESAI") {
-    throw new Error("Sesi tidak ditemukan atau sudah selesai.");
-  }
+  if (!sesi) throw new Error("Sesi tidak ditemukan.");
+  if (sesi.status === "SELESAI") return { success: true };
 
   const ujianObj = await prisma.ujian.findUnique({
     where: { id: sesi.ujianId },
@@ -507,20 +514,28 @@ export async function forceSubmitSesiAction(sesiId: string) {
   const rawNilaiPg = totalBobotPg > 0 ? (correctPg / totalBobotPg) * 100 : 0;
   const nilaiPg = Number(rawNilaiPg.toFixed(2));
 
-  await prisma.$transaction([
-    prisma.sesiUjian.update({
-      where: { id: sesiId },
-      data: { status: "SELESAI", waktuSelesai: new Date() }
-    }),
-    prisma.hasilUjian.create({
-      data: {
-        siswaId: sesi.siswaId,
-        sesiId: sesi.id,
-        nilaiPg,
-        nilaiTotal: nilaiPg,
-      }
-    })
-  ]);
+  try {
+    await prisma.$transaction([
+      prisma.sesiUjian.update({
+        where: { id: sesiId },
+        data: { status: "SELESAI", waktuSelesai: new Date() }
+      }),
+      prisma.hasilUjian.create({
+        data: {
+          siswaId: sesi.siswaId,
+          sesiId: sesi.id,
+          nilaiPg,
+          nilaiTotal: nilaiPg,
+        }
+      })
+    ]);
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      console.log(`[CBT] Abaikan duplicate constraint untuk force-submit sesi ${sesiId}`);
+    } else {
+      throw error;
+    }
+  }
 
   return { success: true };
 }
