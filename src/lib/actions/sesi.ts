@@ -344,22 +344,25 @@ export async function logPelanggaranAction(sesiId: string, tipe: string, keteran
 // Blokir Sesi Ujian (Otomatis saat ketahuan pindah tab)
 export async function blokirSesiAction(sesiId: string, alasan: string) {
   try {
-    const sesi = await prisma.sesiUjian.update({
-      where: { id: sesiId },
-      data: { status: "DIBLOKIR" }
-    });
+    // Jalankan update dan log secara paralel untuk kecepatan
+    await Promise.all([
+      prisma.sesiUjian.update({
+        where: { id: sesiId },
+        data: { status: "DIBLOKIR" }
+      }),
+      prisma.pelanggaran.create({
+        data: {
+          sesiId,
+          tipe: "SYSTEM_BLOCK",
+          keterangan: alasan
+        }
+      })
+    ]);
     
-    await prisma.pelanggaran.create({
-      data: {
-        sesiId,
-        tipe: "SYSTEM_BLOCK",
-        keterangan: alasan
-      }
-    });
-
     revalidatePath(`/ujian-room/${sesiId}`);
     return { success: true };
   } catch (error) {
+    console.error("Gagal memblokir sesi:", error);
     return { success: false, message: "Gagal memblokir sesi." };
   }
 }
@@ -379,23 +382,25 @@ export async function resumeSesiAction(sesiId: string, inputToken: string) {
       return { success: false, message: "Token yang Anda masukkan salah. Hubungi pengawas." };
     }
 
-    // Buka blokir
-    await prisma.sesiUjian.update({
-      where: { id: sesiId },
-      data: { status: "BERJALAN" }
-    });
-
-    await prisma.pelanggaran.create({
-      data: {
-        sesiId,
-        tipe: "RESUME",
-        keterangan: "Sesi berhasil dipulihkan dengan token."
-      }
-    });
+    // Buka blokir dan catat log secara paralel
+    await Promise.all([
+      prisma.sesiUjian.update({
+        where: { id: sesiId },
+        data: { status: "BERJALAN" }
+      }),
+      prisma.pelanggaran.create({
+        data: {
+          sesiId,
+          tipe: "RESUME",
+          keterangan: "Sesi berhasil dipulihkan dengan token."
+        }
+      })
+    ]);
 
     revalidatePath(`/ujian-room/${sesiId}`);
     return { success: true };
   } catch (error) {
+    console.error("Gagal membuka blokir sesi:", error);
     return { success: false, message: "Gagal membuka blokir sesi." };
   }
 }

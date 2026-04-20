@@ -41,6 +41,16 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
   const [unlockError, setUnlockError] = useState("");
   const [violationCount, setViolationCount] = useState(0);
   const [isBlurred, setIsBlurred] = useState(false);
+  const visibilityTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const initialDimensions = React.useRef({ width: 0, height: 0 });
+
+  // Inisialisasi dimensi layar awal
+  useEffect(() => {
+    initialDimensions.current = {
+      width: window.innerWidth,
+      height: window.innerHeight
+    };
+  }, []);
 
   // Helper: Blokir sesi dengan alasan
   const triggerBlock = useCallback((alasan: string) => {
@@ -64,20 +74,42 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
       e.returnValue = "";
     };
 
-    // ── Layer 2: Deteksi pindah tab (Visibility Change) ──
+    // ── Layer 2: Deteksi pindah tab (Visibility Change) dengan Grace Period ──
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        triggerBlock("Siswa berpindah tab atau meminimize browser.");
+        // Jangan langsung blokir, beri waktu 10 detik (Toleransi Layar Mati / Swipe accidental)
+        visibilityTimeoutRef.current = setTimeout(() => {
+          triggerBlock("Siswa meninggalkan halaman terlalu lama (Grace Period Expired).");
+        }, 10000); // 10 Detik
+      } else {
+        // Jika kembali sebelum 10 detik, batalkan pemblokiran
+        if (visibilityTimeoutRef.current) {
+          clearTimeout(visibilityTimeoutRef.current);
+          visibilityTimeoutRef.current = null;
+        }
       }
     };
 
-    // ── Layer 3: Deteksi keluar Fullscreen ──
+    // ── Layer 3: Deteksi keluar Fullscreen & Split Screen (Resize) ──
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement) {
         setIsFullscreen(false);
+        // Cek apakah keluar karena sengaja atau karena resize (split screen)
         triggerBlock("Siswa keluar dari mode layar penuh (Fullscreen).");
       } else {
         setIsFullscreen(true);
+      }
+    };
+
+    const handleResize = () => {
+      if (sessionStatus !== "BERJALAN") return;
+      
+      const widthDiff = Math.abs(window.innerWidth - initialDimensions.current.width);
+      const heightDiff = Math.abs(window.innerHeight - initialDimensions.current.height);
+
+      // Jika layar berubah > 20% secara mendadak, kemungkinan split screen atau resize manual
+      if (widthDiff > initialDimensions.current.width * 0.2 || heightDiff > initialDimensions.current.height * 0.2) {
+        triggerBlock("Deteksi pembagian layar (Split Screen) atau perubahan ukuran jendela.");
       }
     };
 
@@ -168,6 +200,7 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
     window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
+    window.addEventListener("resize", handleResize);
     document.addEventListener("keydown", handleKeyDown, true); // capture phase
     document.addEventListener("copy", handleCopy);
     document.addEventListener("paste", handlePaste);
@@ -180,12 +213,14 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
     document.body.style.webkitUserSelect = "none";
 
     return () => {
+      if (visibilityTimeoutRef.current) clearTimeout(visibilityTimeoutRef.current);
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("blur", handleBlur);
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      window.removeEventListener("resize", handleResize);
       document.removeEventListener("keydown", handleKeyDown, true);
       document.removeEventListener("copy", handleCopy);
       document.removeEventListener("paste", handlePaste);
@@ -211,21 +246,28 @@ export function TestEngine({ sesi, listSoal, jawabanExist }: Props) {
 
   const handleUnlock = () => {
     setUnlockError("");
-    startTransition(async () => {
+    // Jangan gunakan startTransition di sini agar feedback lebih instan jika diinginkan,
+    // atau gunakan async langsung untuk kontrol lebih detail
+    const doUnlock = async () => {
       try {
         const res = await resumeSesiAction(sesi.id, unlockToken);
         if (res.success) {
+          // Update status lokal secara instan
           setSessionStatus("BERJALAN");
           setUnlockToken("");
-          enterFullscreen();
+          // Tunggu sebentar lalu masuk fullscreen
+          setTimeout(() => {
+            enterFullscreen();
+          }, 100);
         } else {
-          // @ts-ignore - Properti message ada pada tipe kembalian error (success: false)
+          // @ts-ignore
           setUnlockError(res.message || "Token salah atau gagal membuka blokir.");
         }
       } catch (err: any) {
         setUnlockError(err.message);
       }
-    });
+    };
+    doUnlock();
   };
 
   const currentSoal = listSoal[currentIndex];
