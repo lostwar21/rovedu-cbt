@@ -241,17 +241,17 @@ export function CetakKartuManager({ data, listKelas }: Props) {
 
         doc.setFontSize(8);
         const rightX = x + cardWidth - 5;
-        doc.text(pengaturan.tempatTanggal, rightX, startY + lineSpacing * 4, { align: "right" });
-        doc.text(pengaturan.jabatanPenandatangan, rightX, startY + lineSpacing * 4 + 4, { align: "right" });
+        doc.text(pengaturan.tempatTanggal, rightX, startY + lineSpacing * 4.5, { align: "right" });
+        doc.text(pengaturan.jabatanPenandatangan, rightX, startY + lineSpacing * 4.5 + 4, { align: "right" });
         
         if (pengaturan.tandaTanganUrl) {
            try {
-             doc.addImage(pengaturan.tandaTanganUrl, 'PNG', rightX - 30, startY + lineSpacing * 4 + 5, 20, 10);
+             doc.addImage(pengaturan.tandaTanganUrl, 'PNG', rightX - 30, startY + lineSpacing * 4.5 + 5, 20, 10);
            } catch(e) {}
         }
         
         doc.setFont("helvetica", "bold");
-        doc.text(pengaturan.namaPenandatangan, rightX, startY + lineSpacing * 4 + 18, { align: "right" });
+        doc.text(pengaturan.namaPenandatangan, rightX, startY + lineSpacing * 4.5 + 18, { align: "right" });
 
         cardsInPage++;
         if (cardsInPage % 2 === 0) {
@@ -575,7 +575,7 @@ export function CetakKartuManager({ data, listKelas }: Props) {
               <h3 className="text-lg font-bold text-foreground">Preview Tampilan Visual</h3>
               <p className="text-xs text-muted-foreground">Tampilan ini merupakan pendekatan dari hasil PDF sesungguhnya.</p>
               <div className="glass rounded-2xl p-6 border border-border/50 flex items-center justify-center bg-muted/20 min-h-[400px]">
-                 <div className="bg-white border border-gray-400 w-[340px] h-[245px] p-4 text-black relative shadow-xl font-sans">
+                 <div className="bg-white border border-gray-400 w-[340px] h-[260px] p-4 text-black relative shadow-xl font-sans">
                     <div className="flex items-start">
                        <div className="w-[50px] h-[50px] flex-shrink-0 flex items-center justify-center mr-2">
                          {pengaturan.logoUrl ? (
