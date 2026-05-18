@@ -167,96 +167,98 @@ export function CetakKartuManager({ data, listKelas }: Props) {
           }] as UserData[]
         : data.filter(u => selectedIds.includes(u.id));
       
-      const cardWidth = 90;
-      const cardHeight = 65;
-      const margin = 10;
+      const cardWidth = 95;
+      const cardHeight = 85;
+      const marginX = 7.5;
+      const marginY = 10;
       const gap = 5;
       
-      let x = margin;
-      let y = margin;
+      let x = marginX;
+      let y = marginY;
       let cardsInPage = 0;
 
       usersToPrint.forEach((user, index) => {
-        if (cardsInPage === 8) {
+        if (cardsInPage === 6) {
           doc.addPage();
-          x = margin;
-          y = margin;
+          x = marginX;
+          y = marginY;
           cardsInPage = 0;
         }
 
         doc.setDrawColor(0, 0, 0);
-        doc.setLineWidth(0.3);
+        doc.setLineWidth(0.4);
         doc.rect(x, y, cardWidth, cardHeight);
         
         if (pengaturan.logoUrl) {
            try {
-             doc.addImage(pengaturan.logoUrl, 'PNG', x + 3, y + 3, 14, 14);
+             doc.addImage(pengaturan.logoUrl, 'PNG', x + 5, y + 4, 16, 16);
            } catch(e) {}
         }
         
         doc.setTextColor(0, 100, 0);
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text(pengaturan.headerInstansi, x + cardWidth / 2 + 5, y + 6, { align: "center" });
+        doc.text(pengaturan.headerInstansi, x + cardWidth / 2 + 5, y + 8, { align: "center" });
         
-        doc.setFontSize(12);
-        doc.text(pengaturan.headerSekolah, x + cardWidth / 2 + 5, y + 11, { align: "center" });
+        doc.setFontSize(13);
+        doc.text(pengaturan.headerSekolah, x + cardWidth / 2 + 5, y + 13, { align: "center" });
         
         doc.setTextColor(0, 0, 0);
-        doc.setFontSize(6);
+        doc.setFontSize(6.5);
         doc.setFont("helvetica", "normal");
-        doc.text(pengaturan.headerAlamat, x + cardWidth / 2 + 5, y + 15, { align: "center" });
+        doc.text(pengaturan.headerAlamat, x + cardWidth / 2 + 5, y + 17, { align: "center" });
 
         doc.setDrawColor(0, 100, 0);
         doc.setLineWidth(0.8);
-        doc.line(x + 2, y + 18, x + cardWidth - 2, y + 18);
+        doc.line(x + 3, y + 20, x + cardWidth - 3, y + 20);
         doc.setLineWidth(0.3);
-        doc.line(x + 2, y + 19, x + cardWidth - 2, y + 19);
+        doc.line(x + 3, y + 21, x + cardWidth - 3, y + 21);
 
         doc.setTextColor(0, 0, 0);
-        doc.setFontSize(9);
+        doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text(pengaturan.judulKartu, x + cardWidth / 2, y + 24, { align: "center" });
-        doc.text(pengaturan.tahunPelajaran, x + cardWidth / 2, y + 28, { align: "center" });
+        doc.text(pengaturan.judulKartu, x + cardWidth / 2, y + 27, { align: "center" });
+        doc.text(pengaturan.tahunPelajaran, x + cardWidth / 2, y + 32, { align: "center" });
 
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
-        const startY = y + 34;
-        const lineSpacing = 4.5;
+        const startY = y + 40;
+        const lineSpacing = 5.5;
         
-        doc.text("NAMA", x + 5, startY);
-        doc.text(":", x + 23, startY);
-        doc.text(user.name || "-", x + 25, startY);
+        doc.text("NAMA", x + 6, startY);
+        doc.text(":", x + 25, startY);
+        doc.text(user.name || "-", x + 27, startY);
 
-        doc.text("NO UJIAN", x + 5, startY + lineSpacing);
-        doc.text(":", x + 23, startY + lineSpacing);
-        doc.text(user.siswa?.nomorUjian || user.siswa?.nis || "-", x + 25, startY + lineSpacing);
+        doc.text("NO UJIAN", x + 6, startY + lineSpacing);
+        doc.text(":", x + 25, startY + lineSpacing);
+        doc.text(user.siswa?.nomorUjian || user.siswa?.nis || "-", x + 27, startY + lineSpacing);
 
-        doc.text("USN", x + 5, startY + lineSpacing * 2);
-        doc.text(":", x + 23, startY + lineSpacing * 2);
-        doc.text(user.username || "-", x + 25, startY + lineSpacing * 2);
+        doc.text("USN", x + 6, startY + lineSpacing * 2);
+        doc.text(":", x + 25, startY + lineSpacing * 2);
+        doc.text(user.username || "-", x + 27, startY + lineSpacing * 2);
 
-        doc.text("PW", x + 5, startY + lineSpacing * 3);
-        doc.text(":", x + 23, startY + lineSpacing * 3);
-        doc.text(user.passwordRaw || "-", x + 25, startY + lineSpacing * 3);
+        doc.text("PW", x + 6, startY + lineSpacing * 3);
+        doc.text(":", x + 25, startY + lineSpacing * 3);
+        doc.text(user.passwordRaw || "-", x + 27, startY + lineSpacing * 3);
 
         doc.setFontSize(8);
-        const rightX = x + cardWidth - 5;
-        doc.text(pengaturan.tempatTanggal, rightX, startY + lineSpacing * 4.5, { align: "right" });
-        doc.text(pengaturan.jabatanPenandatangan, rightX, startY + lineSpacing * 4.5 + 4, { align: "right" });
+        const signatureCenterX = x + cardWidth - 26;
+        
+        doc.text(pengaturan.tempatTanggal, signatureCenterX, startY + lineSpacing * 3 + 8, { align: "center" });
+        doc.text(pengaturan.jabatanPenandatangan, signatureCenterX, startY + lineSpacing * 3 + 12, { align: "center" });
         
         if (pengaturan.tandaTanganUrl) {
            try {
-             doc.addImage(pengaturan.tandaTanganUrl, 'PNG', rightX - 30, startY + lineSpacing * 4.5 + 5, 20, 10);
+             doc.addImage(pengaturan.tandaTanganUrl, 'PNG', signatureCenterX - 14, startY + lineSpacing * 3 + 13, 28, 14);
            } catch(e) {}
         }
         
         doc.setFont("helvetica", "bold");
-        doc.text(pengaturan.namaPenandatangan, rightX, startY + lineSpacing * 4.5 + 18, { align: "right" });
+        doc.text(pengaturan.namaPenandatangan, signatureCenterX, startY + lineSpacing * 3 + 28, { align: "center" });
 
         cardsInPage++;
         if (cardsInPage % 2 === 0) {
-          x = margin;
+          x = marginX;
           y += cardHeight + gap;
         } else {
           x += cardWidth + gap;
@@ -576,9 +578,9 @@ export function CetakKartuManager({ data, listKelas }: Props) {
               <h3 className="text-lg font-bold text-foreground">Preview Tampilan Visual</h3>
               <p className="text-xs text-muted-foreground">Tampilan ini merupakan pendekatan dari hasil PDF sesungguhnya.</p>
               <div className="glass rounded-2xl p-6 border border-border/50 flex items-center justify-center bg-muted/20 min-h-[400px]">
-                 <div className="bg-white border border-gray-400 w-[340px] h-[260px] p-4 text-black relative shadow-xl font-sans">
+                 <div className="bg-white border border-gray-400 w-[360px] h-[320px] p-4 text-black relative shadow-xl font-sans">
                     <div className="flex items-start">
-                       <div className="w-[50px] h-[50px] flex-shrink-0 flex items-center justify-center mr-2">
+                       <div className="w-[55px] h-[55px] flex-shrink-0 flex items-center justify-center mr-2">
                          {pengaturan.logoUrl ? (
                             <img src={pengaturan.logoUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
                          ) : (
@@ -586,31 +588,31 @@ export function CetakKartuManager({ data, listKelas }: Props) {
                          )}
                        </div>
                        <div className="flex-1 text-center">
-                          <div className="text-[#006400] text-[11px] font-bold leading-tight">{pengaturan.headerInstansi}</div>
-                          <div className="text-[#006400] text-[13px] font-bold leading-tight mt-0.5">{pengaturan.headerSekolah}</div>
+                          <div className="text-[#006400] text-[12px] font-bold leading-tight">{pengaturan.headerInstansi}</div>
+                          <div className="text-[#006400] text-[14px] font-bold leading-tight mt-1">{pengaturan.headerSekolah}</div>
                           <div className="text-gray-800 text-[8px] leading-tight mt-1">{pengaturan.headerAlamat}</div>
                        </div>
                     </div>
                     
-                    <div className="border-b-[3px] border-[#006400] mt-2 w-full"></div>
-                    <div className="border-b border-[#006400] mt-[2px] w-full mb-2"></div>
+                    <div className="border-b-[3px] border-[#006400] mt-3 w-full"></div>
+                    <div className="border-b border-[#006400] mt-[2px] w-full mb-3"></div>
                     
-                    <div className="text-center font-bold text-[11px] leading-tight mt-1">{pengaturan.judulKartu}</div>
-                    <div className="text-center font-bold text-[11px] leading-tight">{pengaturan.tahunPelajaran}</div>
+                    <div className="text-center font-bold text-[12px] leading-tight mt-2">{pengaturan.judulKartu}</div>
+                    <div className="text-center font-bold text-[12px] leading-tight mt-1">{pengaturan.tahunPelajaran}</div>
 
-                    <div className="mt-3 text-[10px] space-y-1 pl-2">
-                       <div className="flex"><div className="w-[70px]">NAMA</div><div className="w-[10px]">:</div><div className="font-medium">ABDUL FATHAN</div></div>
-                       <div className="flex"><div className="w-[70px]">NO UJIAN</div><div className="w-[10px]">:</div><div className="font-medium">26-02-17-2-0010-0022</div></div>
-                       <div className="flex"><div className="w-[70px]">USN</div><div className="w-[10px]">:</div><div className="font-medium">User1146</div></div>
-                       <div className="flex"><div className="w-[70px]">PW</div><div className="w-[10px]">:</div><div className="font-medium">Aq3Lo5.o</div></div>
+                    <div className="mt-5 text-[11px] space-y-2 pl-3">
+                       <div className="flex"><div className="w-[75px]">NAMA</div><div className="w-[10px]">:</div><div className="font-medium">ABDUL FATHAN</div></div>
+                       <div className="flex"><div className="w-[75px]">NO UJIAN</div><div className="w-[10px]">:</div><div className="font-medium">26-02-17-2-0010-0022</div></div>
+                       <div className="flex"><div className="w-[75px]">USN</div><div className="w-[10px]">:</div><div className="font-medium">User1146</div></div>
+                       <div className="flex"><div className="w-[75px]">PW</div><div className="w-[10px]">:</div><div className="font-medium">Aq3Lo5.o</div></div>
                     </div>
 
-                    <div className="absolute bottom-4 right-4 text-right text-[9px] leading-tight w-[140px]">
+                    <div className="absolute bottom-6 right-6 text-center text-[10px] leading-tight w-[160px]">
                        <div>{pengaturan.tempatTanggal}</div>
-                       <div className="mt-0.5">{pengaturan.jabatanPenandatangan}</div>
-                       <div className="h-[40px] flex items-center justify-end mt-1 mb-1 relative">
+                       <div className="mt-1">{pengaturan.jabatanPenandatangan}</div>
+                       <div className="h-[45px] flex items-center justify-center mt-2 mb-2 relative">
                           {pengaturan.tandaTanganUrl && (
-                             <img src={pengaturan.tandaTanganUrl} alt="TTD" className="h-[30px] object-contain mr-6" />
+                             <img src={pengaturan.tandaTanganUrl} alt="TTD" className="h-[40px] object-contain" />
                           )}
                        </div>
                        <div className="font-bold">{pengaturan.namaPenandatangan}</div>
