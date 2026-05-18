@@ -87,11 +87,12 @@ model Guru {
 }
 
 model Siswa {
-  id     String  @id @default(cuid())
-  nis    String  @unique
-  nisn   String? @unique
-  userId String  @unique
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String  @id @default(cuid())
+  nis        String  @unique
+  nisn       String? @unique
+  nomorUjian String? // Nomor khusus ujian (bisa sama dgn NIS/beda)
+  userId     String  @unique
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   kelasId String
   kelas   Kelas  @relation(fields: [kelasId], references: [id])

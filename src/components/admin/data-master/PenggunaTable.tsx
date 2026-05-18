@@ -17,6 +17,7 @@ interface UserData {
   role: Role;
   siswa?: {
     nis: string;
+    nomorUjian: string | null;
     kelas: {
       id: string;
       nama: string;
@@ -330,6 +331,16 @@ export function PenggunaTable({ data, listKelas, listMapel }: Props) {
                     placeholder="Contoh: 123456"
                     className="w-full px-4 py-2 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Nomor Peserta Ujian (Opsional)</label>
+                  <input
+                    name="nomorUjian"
+                    defaultValue={editingItem?.siswa?.nomorUjian || ""}
+                    placeholder="Contoh: 26-02-17-2-0010-0022"
+                    className="w-full px-4 py-2 rounded-md border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  />
+                  <p className="text-[10px] text-muted-foreground leading-tight mt-1">Kosongkan jika ingin menggunakan NIS sebagai Nomor Ujian di Kartu.</p>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Kelas</label>

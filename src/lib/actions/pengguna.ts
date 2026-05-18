@@ -62,11 +62,13 @@ export async function createPengguna(formData: FormData) {
 
     if (role === "SISWA") {
       const nis = formData.get("nis") as string;
+      const nomorUjian = formData.get("nomorUjian") as string || null;
       const kelasId = formData.get("kelasId") as string;
       
       await tx.siswa.create({
         data: {
           nis,
+          nomorUjian,
           userId: user.id,
           kelasId,
         }
@@ -111,13 +113,14 @@ export async function updatePengguna(id: string, formData: FormData) {
     // 2. Update specific profile data
     if (role === "SISWA") {
       const nis = formData.get("nis") as string;
+      const nomorUjian = formData.get("nomorUjian") as string || null;
       const kelasId = formData.get("kelasId") as string;
       
       // Upsert to handle if they were previously not a Siswa
       await tx.siswa.upsert({
         where: { userId: id },
-        create: { nis, userId: id, kelasId },
-        update: { nis, kelasId }
+        create: { nis, nomorUjian, userId: id, kelasId },
+        update: { nis, nomorUjian, kelasId }
       });
       // Cleanup other roles if changed
       await tx.guru.deleteMany({ where: { userId: id } });

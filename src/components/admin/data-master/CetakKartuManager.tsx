@@ -14,6 +14,7 @@ interface UserData {
   passwordRaw: string | null;
   siswa?: {
     nis: string;
+    nomorUjian: string | null;
     kelas: {
       id: string;
       nama: string;
@@ -229,7 +230,7 @@ export function CetakKartuManager({ data, listKelas }: Props) {
 
         doc.text("NO UJIAN", x + 5, startY + lineSpacing);
         doc.text(":", x + 23, startY + lineSpacing);
-        doc.text(user.siswa?.nis || "-", x + 25, startY + lineSpacing);
+        doc.text(user.siswa?.nomorUjian || user.siswa?.nis || "-", x + 25, startY + lineSpacing);
 
         doc.text("USN", x + 5, startY + lineSpacing * 2);
         doc.text(":", x + 23, startY + lineSpacing * 2);
