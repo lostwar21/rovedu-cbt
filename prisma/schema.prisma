@@ -279,3 +279,20 @@ model HasilUjian {
 
   @@index([siswaId]) // Riwayat siswa
 }
+
+// --- Pengaturan Aplikasi ---
+
+model PengaturanKartu {
+  id                  String   @id @default("1")
+  headerInstansi      String   @default("MAJELIS PENDIDIKAN")
+  headerSekolah       String   @default("MTs AL WASHLIYAH")
+  headerAlamat        String   @default("Alamat : Jl. Brigjen Rajamin Purba, SH No. 111, Pematangsiantar")
+  judulKartu          String   @default("KARTU PESERTA UJIAN MADRASAH")
+  tahunPelajaran      String   @default("TAHUN PELAJARAN 2025/2026")
+  tempatTanggal       String   @default("Pematangsiantar, 3 Desember 2025")
+  jabatanPenandatangan String   @default("Kepala Madrasah,")
+  namaPenandatangan   String   @default("Dedek Sulaiman, S.Pd.I")
+  logoUrl             String?  @db.Text
+  tandaTanganUrl      String?  @db.Text
+  updatedAt           DateTime @updatedAt
+}
