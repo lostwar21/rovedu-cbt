@@ -13,10 +13,27 @@ export default async function PengawasDashboard() {
 
   const listJadwal = await getJadwalByPengawas(session?.user?.id as string);
 
+  // Filter Jadwal Hari Ini
+  const now = new Date();
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(now);
+  todayEnd.setHours(23, 59, 59, 999);
+
+  const jadwalHariIni = listJadwal.filter(j => {
+    const mulai = new Date(j.waktuMulai);
+    return mulai >= todayStart && mulai <= todayEnd;
+  });
+
+  const jadwalLainnya = listJadwal.filter(j => {
+    const mulai = new Date(j.waktuMulai);
+    return mulai < todayStart || mulai > todayEnd;
+  });
+
   const stats = {
-    ruanganAktif: listJadwal.length,
-    totalPeserta: 0, // Bisa dihitung jika perlu join ke Siswa
-    pelanggaran: 0, // Bisa dihitung dari Pelanggaran table
+    ruanganAktif: jadwalHariIni.length,
+    totalPeserta: 0,
+    pelanggaran: 0,
     selesai: 0
   };
 
@@ -36,7 +53,7 @@ export default async function PengawasDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="glass rounded-[var(--radius-lg)] p-6 hover-lift flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Jadwal Tugas</p>
+            <p className="text-sm font-medium text-muted-foreground mb-1">Jadwal Hari Ini</p>
             <h3 className="text-3xl font-bold text-foreground">{stats.ruanganAktif}</h3>
           </div>
           <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -75,38 +92,41 @@ export default async function PengawasDashboard() {
         </div>
       </div>
 
-      {/* Tampilan Ruangan */}
-      <div className="glass rounded-[var(--radius-lg)] p-6">
+      {/* Tampilan Ruangan HARI INI */}
+      <div className="glass rounded-[var(--radius-lg)] p-6 border-2 border-primary/20">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-foreground">Status Ruangan Anda</h2>
+          <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            Ruangan Aktif (Hari Ini)
+          </h2>
         </div>
         
-        {listJadwal.length === 0 ? (
+        {jadwalHariIni.length === 0 ? (
           <div className="py-12 text-center border-2 border-dashed border-border rounded-xl">
-            <p className="text-muted-foreground">Anda belum memiliki jadwal pengawasan aktif hari ini.</p>
+            <p className="text-muted-foreground">Tidak ada jadwal pengawasan untuk hari ini.</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listJadwal.map((jadwal) => (
-              <div key={jadwal.id} className="p-5 border border-border bg-card rounded-xl hover:border-primary/50 transition-all group">
+            {jadwalHariIni.map((jadwal) => (
+              <div key={jadwal.id} className="p-5 border-2 border-primary/30 bg-card rounded-xl shadow-sm hover:shadow-md transition-all group">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="font-bold text-lg group-hover:text-primary transition-colors">{jadwal.ruang.nama}</h3>
                     <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{jadwal.ujian.mataPelajaran.nama}</p>
                   </div>
                   <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-black bg-emerald-500/10 text-emerald-500 uppercase tracking-tighter">
-                    Tersedia
+                    Hari Ini
                   </span>
                 </div>
                 
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Judul Ujian:</span>
-                    <span className="font-medium">{jadwal.ujian.judul}</span>
+                    <span className="font-medium truncate max-w-[150px]">{jadwal.ujian.judul}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Waktu:</span>
-                    <span className="font-medium">
+                    <span className="font-medium text-primary font-bold">
                       {formatWIBTime(jadwal.waktuMulai)} - {formatWIBTime(jadwal.waktuSelesai)}
                     </span>
                   </div>
@@ -114,15 +134,55 @@ export default async function PengawasDashboard() {
 
                 <Link 
                   href={`/pengawas/monitor/${jadwal.id}`}
-                  className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all"
+                  className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-md"
                 >
-                  <Activity className="w-4 h-4" /> Buka Monitor Ujian
+                  <Activity className="w-4 h-4" /> Masuk ke Ruangan
                 </Link>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Tampilan Ruangan LAINNYA */}
+      {jadwalLainnya.length > 0 && (
+        <div className="glass rounded-[var(--radius-lg)] p-6 opacity-75 mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-muted-foreground">
+              Jadwal Ruangan Lainnya (Lewat / Mendatang)
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {jadwalLainnya.map((jadwal) => (
+              <div key={jadwal.id} className="p-4 border border-border bg-muted/30 rounded-xl hover:border-border/80 transition-all">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-md text-muted-foreground">{jadwal.ruang.nama}</h3>
+                    <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">{jadwal.ujian.mataPelajaran.nama}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-muted-foreground">Waktu:</span>
+                    <span className="font-medium text-muted-foreground">
+                      {new Date(jadwal.waktuMulai).toLocaleDateString('id-ID')}
+                    </span>
+                  </div>
+                </div>
+
+                <Link 
+                  href={`/pengawas/monitor/${jadwal.id}`}
+                  className="w-full bg-background text-muted-foreground border border-border py-1.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-muted transition-all"
+                >
+                  Lihat
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
