@@ -132,6 +132,14 @@ export async function createUjian(data: {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Tidak terautentikasi.");
 
+  // Batasan Trial
+  if (process.env.NEXT_PUBLIC_IS_TRIAL === 'true') {
+    const ujianCount = await prisma.ujian.count();
+    if (ujianCount >= 2) {
+      throw new Error("TRIAL VERSION: Kuota pembuatan ujian dibatasi maksimal 2 sesi.");
+    }
+  }
+
   // Auto-derive tahunAjaranId jika kosong
   let tahunAjaranId = data.tahunAjaranId;
   if (!tahunAjaranId && data.kelasIds.length > 0) {

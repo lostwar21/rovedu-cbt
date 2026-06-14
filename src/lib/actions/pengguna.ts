@@ -42,6 +42,14 @@ export async function createPengguna(formData: FormData) {
   // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // Batasan Trial
+  if (role === "SISWA" && process.env.NEXT_PUBLIC_IS_TRIAL === 'true') {
+    const siswaCount = await prisma.siswa.count();
+    if (siswaCount >= 30) {
+      throw new Error("TRIAL VERSION: Kuota pembuatan siswa dibatasi maksimal 30 data.");
+    }
+  }
+
   // Check if username already exists
   const existingUser = await prisma.user.findUnique({ where: { username } });
   if (existingUser) {
@@ -179,6 +187,15 @@ export async function importPenggunaAction(users: any[]) {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "ADMIN") {
     throw new Error("Unauthorized");
+  }
+
+  // Batasan Trial
+  if (process.env.NEXT_PUBLIC_IS_TRIAL === 'true') {
+    const currentSiswaCount = await prisma.siswa.count();
+    const newSiswaCount = users.filter(u => u.role === "SISWA" || !u.role).length;
+    if (currentSiswaCount + newSiswaCount > 30) {
+      throw new Error(`TRIAL VERSION: Kuota siswa maksimal 30. Saat ini ada ${currentSiswaCount} siswa.`);
+    }
   }
 
   // 1. Ambil data pendukung (Kelas & Mapel) untuk mapping

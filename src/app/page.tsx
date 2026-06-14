@@ -30,9 +30,16 @@ export default function LoginPage() {
           <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-2 hover-lift">
             <BookOpen className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Rovedu CBT
-          </h1>
+          <div className="relative inline-block">
+            {process.env.NEXT_PUBLIC_IS_TRIAL === 'true' && (
+              <span className="absolute -top-4 -right-2 text-[10px] font-bold text-red-500 tracking-widest uppercase">
+                TRIAL VERSION
+              </span>
+            )}
+            <h1 className="text-3xl font-bold tracking-tight text-foreground relative z-10">
+              Rovedu CBT
+            </h1>
+          </div>
           <p className="text-muted-foreground text-sm">
             Sistem Ujian Berbasis Komputer Modern & Nyaman
           </p>

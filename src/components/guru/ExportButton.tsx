@@ -118,20 +118,33 @@ export function ExportButton({ data, filename }: Props) {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 glass rounded-2xl shadow-2xl border border-white/20 overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="p-2 space-y-1">
+            {process.env.NEXT_PUBLIC_IS_TRIAL === 'true' && (
+              <div className="px-3 py-2 text-xs text-red-500 font-medium text-center bg-red-500/10 rounded-xl mb-2">
+                Fitur Export dinonaktifkan di versi Trial.
+              </div>
+            )}
             <button
-              onClick={exportToExcel}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-emerald-500 hover:bg-emerald-500/10 rounded-xl transition-colors text-left"
+              onClick={() => process.env.NEXT_PUBLIC_IS_TRIAL === 'true' ? alert('Fitur Export dinonaktifkan pada versi Trial.') : exportToExcel()}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl transition-colors text-left ${
+                process.env.NEXT_PUBLIC_IS_TRIAL === 'true' 
+                  ? 'text-gray-400 cursor-not-allowed hover:bg-transparent' 
+                  : 'text-emerald-500 hover:bg-emerald-500/10'
+              }`}
             >
-              <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+              <div className={`p-1.5 rounded-lg ${process.env.NEXT_PUBLIC_IS_TRIAL === 'true' ? 'bg-gray-100' : 'bg-emerald-500/10'}`}>
                 <FileSpreadsheet className="w-4 h-4" />
               </div>
               Excel Native (.xlsx)
             </button>
             <button
-              onClick={exportToPDF}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors text-left"
+              onClick={() => process.env.NEXT_PUBLIC_IS_TRIAL === 'true' ? alert('Fitur Export dinonaktifkan pada versi Trial.') : exportToPDF()}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl transition-colors text-left ${
+                process.env.NEXT_PUBLIC_IS_TRIAL === 'true'
+                  ? 'text-gray-400 cursor-not-allowed hover:bg-transparent'
+                  : 'text-rose-500 hover:bg-rose-500/10'
+              }`}
             >
-              <div className="p-1.5 bg-rose-500/10 rounded-lg">
+              <div className={`p-1.5 rounded-lg ${process.env.NEXT_PUBLIC_IS_TRIAL === 'true' ? 'bg-gray-100' : 'bg-rose-500/10'}`}>
                 <FileText className="w-4 h-4" />
               </div>
               PDF Document (.pdf)

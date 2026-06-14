@@ -95,9 +95,14 @@ export function Sidebar({ isOpen, setIsOpen, role = "SISWA" }: SidebarProps) {
                 <div className="flex h-full flex-col">
                     {/* Header */}
                     <div className="h-16 flex items-center justify-between px-6 border-b border-border">
-                        <Link href={`/${role.toLowerCase()}`} className="flex items-center space-x-2 text-primary hover:opacity-80 transition-opacity">
+                        <Link href={`/${role.toLowerCase()}`} className="flex items-center space-x-2 text-primary hover:opacity-80 transition-opacity relative">
                             <BookOpen className="w-6 h-6" />
-                            <span className="text-xl font-bold tracking-tight text-foreground">Rovedu CBT</span>
+                            <div className="flex flex-col">
+                                {process.env.NEXT_PUBLIC_IS_TRIAL === 'true' && (
+                                    <span className="text-[9px] font-bold text-red-500 tracking-widest uppercase absolute -top-2 left-8">TRIAL VERSION</span>
+                                )}
+                                <span className="text-xl font-bold tracking-tight text-foreground">Rovedu CBT</span>
+                            </div>
                         </Link>
                         <button
                             className="lg:hidden p-2 -mr-2 text-muted-foreground hover:bg-muted rounded-full transition-colors"
