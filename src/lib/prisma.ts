@@ -9,12 +9,16 @@ const globalForPrisma = globalThis as unknown as {
     pool: Pool | undefined;
 };
 
+// Membersihkan sslmode dari string karena pg module akan meng-override rejectUnauthorized: false
+// jika sslmode=require ada di connection string
+const cleanConnectionString = connectionString.replace(/&sslmode=[^&]+/g, '').replace(/\?sslmode=[^&]+&?/g, '?');
+
 const pool = globalForPrisma.pool ?? new Pool({
-  connectionString,
+  connectionString: cleanConnectionString,
   max: 25,                    
   idleTimeoutMillis: 60000, 
   connectionTimeoutMillis: 10000,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined
+  ssl: { rejectUnauthorized: false } // Selalu izinkan self-signed untuk Supabase Vercel
 });
 if (process.env.NODE_ENV !== "production") globalForPrisma.pool = pool;
 
