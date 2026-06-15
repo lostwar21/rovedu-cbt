@@ -19,7 +19,8 @@ export async function loginAction(formData: FormData) {
                 case "CredentialsSignin":
                     return { error: "Username atau password salah." };
                 default:
-                    return { error: "Terjadi kesalahan saat login." };
+                    console.error("🔥 AUTH ERROR:", error.type, error.message);
+                    return { error: `Kesalahan login: ${error.type} - ${error.message?.substring(0, 100)}` };
             }
         }
         throw error;
