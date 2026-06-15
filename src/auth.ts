@@ -19,19 +19,25 @@ export const {
             async authorize(credentials) {
                 if (!credentials?.username || !credentials?.password) return null;
 
-                const user = await prisma.user.findUnique({
-                    where: { username: credentials.username as string },
-                });
+                try {
+                    const user = await prisma.user.findUnique({
+                        where: { username: credentials.username as string },
+                    });
 
-                if (!user || !user.password) return null;
+                    if (!user || !user.password) return null;
 
-                const passwordMatch = await bcrypt.compare(
-                    credentials.password as string,
-                    user.password
-                );
+                    const passwordMatch = await bcrypt.compare(
+                        credentials.password as string,
+                        user.password
+                    );
 
-                if (passwordMatch) return user;
-                return null;
+                    if (passwordMatch) return user;
+                    return null;
+                } catch (error) {
+                    console.error("🔥 ERROR DI AUTHORIZE:", error);
+                    // Lemparkan pesan spesifik agar terlihat di log
+                    throw error;
+                }
             },
         }),
     ],
